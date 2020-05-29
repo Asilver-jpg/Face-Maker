@@ -52,6 +52,7 @@ export default class GameContainer extends React.Component {
 
   }
   render() {
+    console.log(this.state.faceIsPresent)
     return (
       <div className="grid-container">
 
@@ -69,7 +70,7 @@ export default class GameContainer extends React.Component {
         </div>
         <div className="timer-display">
           {this.state.gameRunning === true && this.state.isCrushed === false ?
-            <Timer />
+            <Timer face= {this.state.faceIsPresent}/>
             :
             <button className="timer" onClick={this.stopGame}><h1>Time</h1></button>
           }

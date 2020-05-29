@@ -16,8 +16,9 @@ class Scene extends React.Component {
         render: "",
         paddle: "",
         running: "",
-        engine:"",
-        canvas:""
+        engine: "",
+        canvas: "",
+        ball: ""
     }
     //start of mounting
     componentDidMount() {
@@ -36,13 +37,11 @@ class Scene extends React.Component {
         })
         this.start(engine, render)
     }
-    start = (engine, render)=>{
+    start = (engine, render) => {
         //add starting stuff!!
-        if(!this.state.render.canvas){
-        }
         let boundaryLeft = Bodies.rectangle(10, 332, 25, 800, { isStatic: true })
         let boundaryRight = Bodies.rectangle(600, 332, 25, 800, { isStatic: true })
-        let circle = Bodies.circle(250, 400, 25, { friction: 0, density: 0.1, frictionAir: .01 })
+        let circle = Bodies.circle(250, 470, 25, { friction: 0, density: 0.5, frictionAir: .01 })
         let paddle = Bodies.rectangle(300, 500, 800, 25, { isStatic: true, friction: 0 })
         let testPlatform = Bodies.rectangle(180, 100, 100, 40, { isStatic: true });
         this.state.rectangles.push(testPlatform)
@@ -52,7 +51,7 @@ class Scene extends React.Component {
         Engine.run(engine)
         Render.run(render)
         //update state
-        this.setState({ engine:engine, render: render, paddle: paddle, ball: circle, running: true }, () => { console.log(this.state.render) })
+        this.setState({ ball: circle, engine: engine, render: render, paddle: paddle, ball: circle, running: true }, () => { console.log(this.state.render) })
         //create collision pair 
         let paddleCircle = [[paddle, circle]]
         //add, update, and delete rectangles over time
@@ -70,6 +69,7 @@ class Scene extends React.Component {
     }
     //update function, called each 33.3 milliseconds
     update = (circle, paddle, paddleCircle, engine) => {
+        this.state.ball = circle
         if (this.props.face === true) {
             this.setRotation(paddle, this.props.angle)
             if (this.props.mouth >= 10) {
@@ -80,7 +80,7 @@ class Scene extends React.Component {
             }
             for (const rect of this.state.rectangles) {
                 Body.setPosition(rect, { x: rect.position.x, y: (rect.position.y) + 5 })
-                if (this.isTouchingBottom(circle, rect, 25) && Detector.collisions(paddleCircle, engine)[0].collided) {
+                if ((this.isTouchingBottom(circle, rect, 25) && Detector.collisions(paddleCircle, engine)[0].collided) || this.state.ball.position.y > 550) {
                     //change game state in game container
 
                     //clear game loop and other loops
@@ -95,16 +95,18 @@ class Scene extends React.Component {
                     this.setState({ rectangles: [] })
                     this.state.render.canvas.remove()
                     this.state.render.canvas = null
-                    this.state.render.context=null
-                    this.render.textures={}
+                    this.state.render.context = null
+                    this.render.textures = {}
                     Engine.run(engine)
                     this.props.stopGame()
 
                 }
             }
         }
+
     }
-    
+
+
     paddlePosition = (e) => {
         console.log("EE")
         if (e.keyCode === 68) {
