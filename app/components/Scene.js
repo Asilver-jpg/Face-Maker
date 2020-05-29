@@ -39,7 +39,6 @@ class Scene extends React.Component {
     start = (engine, render)=>{
         //add starting stuff!!
         if(!this.state.render.canvas){
-          
         }
         let boundaryLeft = Bodies.rectangle(10, 332, 25, 800, { isStatic: true })
         let boundaryRight = Bodies.rectangle(600, 332, 25, 800, { isStatic: true })
@@ -65,7 +64,9 @@ class Scene extends React.Component {
     }
     //end of onMount
     componentWillUnmount() {
-        clearInterval()
+        clearInterval(this.updateInterval)
+        clearInterval(this.deleteRectanglesInterval)
+        clearInterval(this.addRectanglesInterval)
     }
     //update function, called each 33.3 milliseconds
     update = (circle, paddle, paddleCircle, engine) => {
@@ -86,7 +87,7 @@ class Scene extends React.Component {
                     clearInterval(this.updateInterval)
                     clearInterval(this.deleteRectanglesInterval)
                     clearInterval(this.addRectanglesInterval)
-       
+
                     //clear matter.js and its canvas
                     World.clear(engine.world)
                     Engine.clear(engine)

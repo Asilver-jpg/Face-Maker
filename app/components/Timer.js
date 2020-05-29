@@ -8,7 +8,7 @@ class Timer extends React.Component{
     this.setState({time: this.state.time + 1})
 }
   componentDidMount(){
-    setTimeout(()=>  this.interval = setInterval(this.tick, 1000), 3000 )
+    this.interval = setInterval(this.tick, 1000)
   }
   componentWillUnmount(){
     clearInterval(this.interval)

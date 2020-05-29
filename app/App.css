@@ -82,13 +82,14 @@
   .grid-container{
     display: grid;
     grid-template-areas:
-    '   header header'
-    '   main video'
-    '   main timer'
-    '   main score'
-    '   main start';
+    'header header'
+    'main video'
+    'main timer'
+    'main score'
+    'final start'
+;
     grid-gap: 20px;
-    background-color: rgb(181, 211, 235);
+
     padding: 10px;
     width:800px
   }
@@ -99,6 +100,11 @@
   }
   .video-display{
       grid-area:video;
+      outline: black;
+      outline-width: 6px;
+      outline-style: solid;
+      width: 400px;
+      height: 300px;
   }
   .timer-display{
     grid-area: timer;
@@ -154,4 +160,23 @@
   .instructions-list {
     margin: auto;
     padding: 50px;
+  }
+
+  .finalScore{
+    grid-area: final;
+    background: #92CD41;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    font-size: 20px;
+    padding: 20px;
+    margin-left: 75px;
+    font-family: 'Press Start 2P', cursive;
+    text-decoration: none; 
+    color: white;
+    box-shadow: inset -4px -4px 0px 0px #4AA52E;
+    outline: black;
+    outline-style: solid;
+    outline-width: 6px;
+    width: 400px;
   }

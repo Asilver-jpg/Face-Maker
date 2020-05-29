@@ -27,21 +27,29 @@ export default class GameContainer extends React.Component {
 
   startGame = () => {
     if (this.state.gameRunning === false) {
-      this.setState({ gameRunning: !this.state.gameRunning })
+      this.setState({ gameRunning: !this.state.gameRunning})
+      this.setState({finalScore: 0})
     } else if (this.state.gameRunning === true) {
       this.setState({ gameRunning: !this.state.gameRunning })
     }
   }
+
+  
   crushed = () => {
     this.setState({ isCrushed: true })
-    this.setState({isCrushed:false})
     this.setState({ gameRunning: false })
+    this.reset()
   }
+
+  reset = () => {
+    this.setState({isCrushed:false})
+  }
+
+
   finalScore = (score) => {
     this.setState({ finalScore: score })
-    this.displayFinalScore(this.state.finalScore)
-  }
-  displayFinalScore = (score) => {
+
+
   }
   render() {
     return (
@@ -55,7 +63,6 @@ export default class GameContainer extends React.Component {
             stopGame={this.crushed}
             gameRunning={this.state.gameRunning}
           ></Scene>}
-          
         </div>
         <div className="video-display">
           <Home gameRunning={this.state.gameRunning}setMouth={this.setMouth} isRunning= {this.state.gameRunning}setRotation={this.setAngle} setFace={this.setFace} />
@@ -81,6 +88,10 @@ export default class GameContainer extends React.Component {
             <button className="start" onClick={this.startGame}><h1>Start Game</h1></button>
           }
         </div>
+        {this.state.finalScore > 0 ?
+        <button className='finalScore'><h1>Final Score {this.state.finalScore}</h1></button>
+        :
+        null}
       </div>
 
 

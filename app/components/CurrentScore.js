@@ -8,7 +8,7 @@ class CurrentScore extends React.Component{
     this.setState({score: this.state.score + 25})
 }
 componentDidMount(){
-  setTimeout(()=> this.interval = setInterval(this.scorePoints, 3000), 3000 )
+  this.interval = setInterval(this.scorePoints, 3000)
 }
 componentWillUnmount(){
   this.props.finalScore(this.state.score)

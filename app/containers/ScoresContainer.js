@@ -25,10 +25,10 @@ class ScoresContainer extends React.Component {
     const sortedScores = this.state.scores.sort((a,b) => a.value > b.value? -1 :1)
 
     // console.log("ScoresContainer State=>", this.state.scores)
-    
+
     return(
       <div>
-        <h1>You are on the high scores page</h1>
+        <h1>High Scores</h1>
         <div className='card-container'>
         {sortedScores.map(score => 
         <ScoreListing
