@@ -27,18 +27,23 @@ class ScoresContainer extends React.Component {
     // console.log("ScoresContainer State=>", this.state.scores)
 
     return(
-      <div>
-        <h1>High Scores</h1>
+      <div className="scoreContainer">
+        <h1><u>High Scores</u></h1>
         <div className='card-container'>
+          <ul>
         {sortedScores.map(score => 
+        <li>
         <ScoreListing
           key={score.id}
           name={this.getUsername(score.user_id)}
           value={score.value}
-        />)}
+          
+        />
+          </li>)}
+          </ul>
+      
         </div>
     
-        <Link to='/'><button className="eightbit-btn">Home</button></Link>
       </div>
     )
   }

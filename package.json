@@ -95,7 +95,6 @@
     "invariant": "2.2.2",
     "ip": "1.1.5",
     "lodash": "^4.17.15",
-    "matter-js": "^0.14.2",
     "minimist": "^1.2.5",
     "react": "16.13.0",
     "react-dom": "^16.13.1",
