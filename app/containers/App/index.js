@@ -7,7 +7,7 @@
 import React, { Component } from 'react';
 import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
 
-import Home from 'containers/Home'
+import Face from 'containers/Face/'
 import Test from 'containers/Test'
 import NotFound from 'containers/NotFound';
 
@@ -21,7 +21,7 @@ export default class App extends React.Component {
   
       <div>
      
-      <Route exact path='/' component={Home}/>
+      <Route exact path='/' component={Face}/>
       <Route exact path='/test' component={Test}/>
       </div>
     )}
