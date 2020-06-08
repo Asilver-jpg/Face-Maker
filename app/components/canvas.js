@@ -9,7 +9,7 @@ export default class Canvas extends React.Component {
         canvasWidth: 0,
         canvasHeight: 0,
         color: "#0000FF",
-        mode: "Edit",
+        mode: "Select",
         noseIsScrunched: 0,
         loop: "",
         activeShape: "",
@@ -21,9 +21,9 @@ export default class Canvas extends React.Component {
         fill: "",
         stroke: "",
         colorsHash: {},
-        isPlaced:false,
-        startWidth:0,
-        startHeight:0
+        isPlaced: false,
+        startWidth: 0,
+        startHeight: 0
     }
 
     componentDidMount() {
@@ -72,14 +72,21 @@ export default class Canvas extends React.Component {
                     x: this.getCanvasPointX(Math.floor(this.props.nosePosition[0])),
                     y: this.getCanvasPointY(Math.floor(this.props.nosePosition[1]))
                 }
-            },()=>{
+            }, () => {
                 this.manageMode()
-                this.manageTransform()
+                if (this.state.mode === "Edit") {
+                    this.manageTransform()
+                } else if (this.state.mode === "Select") {
+                    this.manageSelect()
+                }
                 this.managePlacement()
             })
-           
         }
+       
         this.drawAllShapes()
+        if(this.state.mode==="Select"){
+            this.drawCursor(this.state.mainContext)
+        }
     }
 
     clearCanvas = () => {
@@ -112,32 +119,36 @@ export default class Canvas extends React.Component {
     }
     //posX, posY, width, height, fill, stroke, strokeWeight
     manageTransform = () => {
-        if (this.state.mode === "Edit") {
-            if (this.state.activeShape === "") {
-                let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 20, 20, this.state.fill, this.state.stroke, this.state.strokeWeight,0)
-                this.addToShapes(newShape)
-                this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth:newShape.width })
-            } else {
-                let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist), 
-                                                    this.state.startHeight+ this.getRectDimensions(this.props.mouthDist), this.state.fill, this.state.stroke, 
-                                                    this.state.strokeWeight, this.props.noseAngle *2)
-                this.state.shapes[this.state.shapes.length - 1] = editedNewShape
-                this.setState({ activeShape: editedNewShape })
-            }
+
+        if (this.state.activeShape === "") {
+            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 20, 20, this.state.fill, this.state.stroke, this.state.strokeWeight, 0)
+            this.addToShapes(newShape)
+            this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
+        } else {
+            let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
+                this.state.startHeight + this.getRectDimensions(this.props.mouthDist), this.state.fill, this.state.stroke,
+                this.state.strokeWeight, this.props.noseAngle * 2)
+            this.state.shapes[this.state.shapes.length - 1] = editedNewShape
+            this.setState({ activeShape: editedNewShape })
         }
     }
 
-    managePlacement =()=>{
-        if(this.props.eyebrows && this.state.activeShape !== ""){
-            if(this.state.mode==="Edit" && this.state.isPlaced===false){
-                this.setState({activeShape:"", isPlaced:true})
+
+
+    managePlacement = () => {
+        if (this.props.eyebrows && this.state.activeShape !== "") {
+            if (this.state.mode === "Edit" && this.state.isPlaced === false) {
+                this.setState({ activeShape: "", isPlaced: true })
             }
-        }else if(this.props.eyebrows===false && this.state.isPlaced===true){
-            this.setState({isPlaced:false})
+        } else if (this.props.eyebrows === false && this.state.isPlaced === true) {
+            this.setState({ isPlaced: false })
         }
     }
-    
-  
+
+    manageSelect = () => {
+
+    }
+
     //mapping functions
     getCanvasPointX = (value) => {
 
@@ -156,8 +167,8 @@ export default class Canvas extends React.Component {
         }
         return this.mapRange(value, 100, 200, 0, 600)
     }
-    getRectDimensions= (value)=>{
-        return this.mapRange(value, 0, 24, 0,60)
+    getRectDimensions = (value) => {
+        return this.mapRange(value, 0, 24, 0, 60)
     }
     //map range 1 to range 2
     mapRange = (value, low1, high1, low2, high2) => {
@@ -171,7 +182,7 @@ export default class Canvas extends React.Component {
             return -1 * scaleFactor * (90 + value)
         }
     }
-    
+
 
     //drawing functions
     drawCircle = (posx, posy, radius, context) => {
@@ -193,9 +204,10 @@ export default class Canvas extends React.Component {
 
     drawRectangle = (shape, context) => {
         context.beginPath()
-        context.rect(shape.posX, shape.posY, shape.width, shape.height)
-        context.translate(shape.posX + (shape.width/2), shape.posY+ (shape.height/2))
-        context.rotate((Math.PI /180) * shape.rotation)
+        context.translate(shape.posX + (shape.width / 2), shape.posY + (shape.height / 2))
+        context.rotate((-1 * shape.rotation * Math.PI / 180))
+        context.rect(0, 0, shape.width, shape.height)
+
         if (context.canvas.id) {
             context.lineWidth = shape.lineWidth
             context.strokeStyle = shape.strokeStyle
@@ -207,6 +219,19 @@ export default class Canvas extends React.Component {
             context.fill()
         }
         context.resetTransform()
+    }
+    drawCursor=(context)=>{
+        console.log(context)
+        let radius = 5;
+        context.beginPath();
+        context.arc(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, radius, 0, 2 * Math.PI, false);
+        context.lineWidth=3;
+        context.strokeStyle = "#000000"
+        context.stroke()
+        
+       
+
+
     }
     addHitGraph = () => {
         this.state.shapes.forEach(shape => {
@@ -269,7 +294,7 @@ export default class Canvas extends React.Component {
 }
 
 class Rectangle {
-    constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation=0) {
+    constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
         this.posX = posX
         this.posY = posY
         this.width = width
@@ -278,7 +303,7 @@ class Rectangle {
         this.stroke = stroke
         this.strokeWeight = strokeWeight
         this.colorKey = new Color(0, 0, 0)
-        this.rotation= rotation
+        this.rotation = rotation
     }
     setColorKey(value) {
         this.colorKey = value
