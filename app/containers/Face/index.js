@@ -6,7 +6,7 @@
 
 import React from 'react';
 import Helmet from 'react-helmet';
-
+import Canvas from "../../components/canvas"
 import clm from 'clmtrackr';
 
 import './style.css';
@@ -27,7 +27,7 @@ export default class Home extends React.PureComponent {
       startValue: "Waiting",
       startDisabled: true,
       //nose
-      noseAngle: 0,
+      noseAngle: "",
       noseStart: null,
       noseScrunch: false,
       noseScrunchHeld: false,
@@ -35,6 +35,7 @@ export default class Home extends React.PureComponent {
       noseDist: 0,
       noseNorm: null,
       nosePrev: null,
+      nosePosition: "",
       //eyebrows
       leftEyebrowDist: 0,
       rightEyebrowDist: 0,
@@ -47,13 +48,14 @@ export default class Home extends React.PureComponent {
       mouthDist: 0,
       //face
       faceDirection: "still",
-      faceToMove: 0,
+      faceToMove: "",
       faceWidth: 0,
-      faceWidthStart: 0,
+      faceWidthStart: 0, 
       //other
       setTimeout: false
     }
   }
+ 
 
   componentWillMount() {
     this.ctrack = new clm.tracker({ useWebGL: true });
@@ -97,7 +99,7 @@ export default class Home extends React.PureComponent {
   //reset parameters
   componentWillUnmount() {
     this.setState({
-      noseAngle: 0,
+      noseAngle: "",
       eyebrowDist: 0,
       mouthDist: 0,
       noseScrunch: false,
@@ -186,7 +188,7 @@ export default class Home extends React.PureComponent {
     }
     let cp = this.ctrack.getCurrentPosition();
     if (cp === false || this.props.isRunning === false) {
-      this.props.setFace(false)
+    
     } else {
       //leftEyebrow: 24, 21
       //right eyebrow 17, 29
@@ -203,7 +205,7 @@ export default class Home extends React.PureComponent {
       if (this.state.noseNorm === null) {
         this.setState({
           noseNorm: noseLength, nosePrev: noseLength, rightEyebrowDist: rightEyebrowDist, leftEyebrowDist: leftEyebrowDist, mouthDist: mouthDistance, noseAngle: angle,
-          leftEyebrowPrev: leftEyebrowDist, rightEyebrowPrev: rightEyebrowDist, noseStart: noseLength, faceWidth: faceWidth, faceWidthStart: faceWidth,
+          leftEyebrowPrev: leftEyebrowDist, rightEyebrowPrev: rightEyebrowDist, noseStart: noseLength, faceWidth: faceWidth, faceWidthStart: faceWidth, nosePosition: cp[62],
           eyebrowCounter: setInterval(() => { this.setState({ eyebrowCounter: this.state.eyebrowCounter + 1 }) }, 500),
           noseCounter: setInterval(() => { this.setState({ noseCounter: this.state.noseCounter + 1 }) }, 500)
         })
@@ -215,8 +217,10 @@ export default class Home extends React.PureComponent {
       }
       //determine if face is moving forward backward or is still
       this.faceMovementDirection(noseLength)
-      //update the  nose's length, left and right eyebrow length, face width
-      this.setState({  faceWidth: faceWidth, leftEyebrowDist: leftEyebrowDist, rightEyebrowDist: rightEyebrowDist, noseDist: noseLength })
+      //update the  nose's length, left and right eyebrow length, face width, nose position
+      if(this.state.noseNorm !== null){
+      this.setState({  faceWidth: faceWidth, leftEyebrowDist: leftEyebrowDist, rightEyebrowDist: rightEyebrowDist, noseDist: noseLength, nosePosition:cp[62] })
+      }
       //check if face is too far, too close or in right position
       this.isCloseToStart()
       //if face is in the right position do things
@@ -231,11 +235,11 @@ export default class Home extends React.PureComponent {
     }
   }
   isCloseToStart = () => {
-    if (this.faceStartToFaceCur() > 5) {
+    if (this.faceStartToFaceCur() > 7) {
       this.setState({ faceToMove: 1 })
-    } else if (this.faceStartToFaceCur() < -5) {
+    } else if (this.faceStartToFaceCur() < -10) {
       this.setState({ faceToMove: 2 })
-    } else {
+    } else if(this.state.faceToMove !== 0) {
       this.setState({ faceToMove: 0 })
     }
   }
@@ -245,7 +249,7 @@ export default class Home extends React.PureComponent {
 
   determineNoseScrunched = (nose) => {
 
-    if (this.state.noseStart - nose > 2) {
+    if (this.state.noseStart - nose > 3) {
       this.setState({ noseScrunch: true })
     } else {
       this.setState({ noseScrunch: false })
@@ -263,7 +267,7 @@ export default class Home extends React.PureComponent {
     }
   }
   determineEyebrowsUp = (left, right) => {
-    if (this.state.leftEyebrowDist - this.state.leftEyebrowPrev > 3 || this.state.rightEyebrowDist - this.state.rightEyebrowPrev > 3) {
+    if (this.state.leftEyebrowDist - this.state.leftEyebrowPrev > 7 || this.state.rightEyebrowDist - this.state.rightEyebrowPrev > 7) {
       this.setState({ eyebrows: true })
     } else {
       this.setState({ eyebrows: false })
@@ -328,12 +332,19 @@ export default class Home extends React.PureComponent {
           <p>{this.state.noseScrunchHeld ? "Nose scrunched is held" : "Nose scrunched is not held"}</p>
           <p>Your mouth is this many pixels open: {Math.floor(this.state.mouthDist)}</p>
           <p>The angle of your face is : {Math.floor(this.state.noseAngle)}</p>
+         <p>Nose is at position x:{this.state.nosePosition === "" ? " ":Math.floor(this.state.nosePosition[0])} y:{this.state.nosePosition===" "? " ": Math.floor(this.state.nosePosition[1])}</p>
           <button onClick={this.startVideo}>Start</button>
+          <Canvas mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
         </div>
       </div>
     );
   }
 }
+
+
+
+
+
 
 
 // Helper Functions
