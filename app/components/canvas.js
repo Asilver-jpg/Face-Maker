@@ -146,8 +146,29 @@ export default class Canvas extends React.Component {
     }
 
     manageSelect = () => {
-
+        if(!this.props.eyebrows){
+            this.setState({eyebrowsUp: false})
+        }
+        if(this.state.activeShape!== "" && this.props.eyebrowsHeld && this.state.eyebrowsUp===false){
+                this.deleteShape(this.state.activeShape)
+                this.setState({fromSelect:false, eyebrowsUp: false, activeShape:""})
+        }else 
+        if(this.props.eyebrows && this.state.eyebrowsUp===false){
+        
+            const pixel= this.state.hitCtx.getImageData(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 1,1).data
+            const color= `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
+            const shape= this.state.colorsHash[color];
+           
+                if(shape !== undefined){
+                    
+                    this.setState({activeShape:shape, eyebrowsUp: true, fromSelect:true})
+                }
+        }else if(this.shape=== undefined && this.props.eyebrows && this.state.activeShape!=="" && this.state.eyebrowsUp===false){
+            this.setState({activeShape:"", eyebrowsUp: true, fromSelect: false})
+        }
     }
+
+    
 
     //mapping functions
     getCanvasPointX = (value) => {
@@ -221,7 +242,6 @@ export default class Canvas extends React.Component {
         context.resetTransform()
     }
     drawCursor=(context)=>{
-        console.log(context)
         let radius = 5;
         context.beginPath();
         context.arc(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, radius, 0, 2 * Math.PI, false);
