@@ -9,7 +9,7 @@ export default class Canvas extends React.Component {
         canvasWidth: 0,
         canvasHeight: 0,
         color: "#0000FF",
-        mode: "Select",
+        mode: "Edit",
         noseIsScrunched: 0,
         loop: "",
         activeShape: "",
@@ -25,7 +25,8 @@ export default class Canvas extends React.Component {
         startWidth: 0,
         startHeight: 0,
         eyebrowsUp: false,
-        fromSelect: false
+        fromSelect: false,
+        isDelete:false
     }
 
     componentDidMount() {
@@ -43,7 +44,9 @@ export default class Canvas extends React.Component {
 
         let color = new Color(255, 0, 0)
         let rect = new Rectangle(200, 200, 80, 80, color, 2)
+        let rect2 = new Rectangle(100, 200, 80, 80, color, 2)
         this.addToShapes(rect)
+        this.addToShapes(rect2)
 
         this.setState({
             mainCanvas: mainCanvas, mainContext: mainContext, hitCtx: hitCtx, canvasWidth: canvasWidth, canvasHeight: canvasHeight,
@@ -72,7 +75,8 @@ export default class Canvas extends React.Component {
     //called every 3 milliseconds
     draw = () => {
         //console.log(this.props.nosePosition[0])
-        this.clearCanvas()
+        this.clearCanvas(this.state.mainContext)
+
         //if face is in the right place and exists
         if (this.props.faceToMove === 0) {
             this.setState({
@@ -81,7 +85,7 @@ export default class Canvas extends React.Component {
                     y: this.getCanvasPointY(Math.floor(this.props.nosePosition[1]))
                 }
             }, () => {
-                //this.manageMode()
+                this.manageMode()
                 if (this.state.mode === "Edit") {
                     this.manageTransform()
                 } else if (this.state.mode === "Select") {
@@ -90,6 +94,9 @@ export default class Canvas extends React.Component {
                 this.managePlacement()
             })
         }
+        if(this.props.eyebrows===false){
+            this.setState({toDelete:false})
+        }
 
         this.drawAllShapes()
         if (this.state.mode === "Select") {
@@ -97,9 +104,8 @@ export default class Canvas extends React.Component {
         }
     }
 
-    clearCanvas = () => {
-        let mainCanvas = document.querySelector("#canvas")
-        let context = mainCanvas.getContext("2d")
+    clearCanvas = (context) => {
+
         context.clearRect(0, 0, 450, 600)
     }
     //shape management functions
@@ -118,7 +124,7 @@ export default class Canvas extends React.Component {
                     this.setState({ mode: "Edit", noseIsScrunched: 0 })
                     break;
                 case "Select":
-                    this.setState({ mode: "Edit", noseIsScrunched: 0 })
+                    this.setState({ mode: "Edit", noseIsScrunched: 0, activeShape: "" })
                     break;
             }
         } else if (this.state.noseIsScrunched === 2 && this.props.noseScrunch === false) {
@@ -129,7 +135,7 @@ export default class Canvas extends React.Component {
     manageTransform = () => {
 
         if (this.state.activeShape === "") {
-            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 20, 20, this.state.fill, this.state.stroke, this.state.strokeWeight, 0)
+            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, this.state.fill, this.state.stroke, this.state.strokeWeight, 0)
             this.addToShapes(newShape)
             this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
         } else {
@@ -147,6 +153,7 @@ export default class Canvas extends React.Component {
         if (this.props.eyebrows && this.state.activeShape !== "") {
             if (this.state.mode === "Edit" && this.state.isPlaced === false) {
                 this.setState({ activeShape: "", isPlaced: true })
+                this.addHitGraph()
             }
         } else if (this.props.eyebrows === false && this.state.isPlaced === true) {
             this.setState({ isPlaced: false })
@@ -160,28 +167,31 @@ export default class Canvas extends React.Component {
         if (!this.props.eyebrows) {
             this.setState({ eyebrowsUp: false })
         }
-        if(this.state.activeShape!== "" && this.props.eyebrowsHeld){
-                console.log("delete")
-                this.deleteShape(this.state.activeShape)
-                this.setState({fromSelect:false, eyebrowsUp: false, activeShape:""})
-        }else 
-        if (shape !== undefined && this.props.eyebrows && this.state.eyebrowsUp === false) {
-            console.log("Select")
-            this.setState({ activeShape: shape, eyebrowsUp: true, fromSelect: true })
+        if (this.state.activeShape !== "" && this.props.eyebrowsHeld) {
+            this.deleteShape(this.state.activeShape)
+            this.setState({ fromSelect: false, eyebrowsUp: false, activeShape: "" })
+        } else
+            if (shape !== undefined && this.props.eyebrows && this.state.eyebrowsUp === false) {
+                console.log("Select")
+                this.setState({ activeShape: shape, eyebrowsUp: true, fromSelect: true })
 
-        } else if (shape === undefined && this.props.eyebrows && this.state.activeShape !== "" && this.state.eyebrowsUp === false) {
-            console.log("Deselect")
-            this.setState({ activeShape: "", eyebrowsUp: true, fromSelect: false })
-        }
+            } else if (shape === undefined && this.props.eyebrows && this.state.activeShape !== "" && this.state.eyebrowsUp === false) {
+                console.log("Deselect")
+                this.setState({ activeShape: "", eyebrowsUp: true, fromSelect: false })
+            }
     }
 
     deleteShape = (shape) => {
+        
         let index = this.state.shapes.indexOf(shape)
-        if (index > -1) {
-            let toDelete = this.state.shapes[index]
-            this.state.shapes.splice(index, 1)
+        console.log(index)
+        if (index > -1 && this.state.isDelete===false) {
+            let i= this.state.shapes.findIndex(s => s===shape)
+            let toDelete = this.state.shapes[i]
+            this.state.shapes.splice(i, 1)
             let color = `rgb(${toDelete.color.r}, ${toDelete.color.g}, ${toDelete.color.b})`
             delete this.state.colorsHash[color]
+            this.setState({isDelete:true})
         }
     }
 
@@ -284,18 +294,29 @@ export default class Canvas extends React.Component {
 
     drawAllShapes = () => {
 
-        this.state.shapes.forEach(shape => {
-            if (shape.radius) {
-                this.drawCircle(shape, this.state.mainContext)
-                this.drawCircle(shape, this.state.hitCtx)
-
-            } else if (shape.width) {
-
-                this.drawRectangle(shape, this.state.mainContext)
-                this.drawRectangle(shape, this.state.hitCtx)
+        if (this.state.mode === "Edit") {
+            this.state.shapes.forEach(shape => {
+                this.drawTheShapes(shape, this.state.mainContext)
+            })
+            for (let i = 0; i < this.state.shapes.length-1; i++) {
+                    this.drawTheShapes(this.state.shapes[i], this.state.hitCtx) 
             }
+        } else {
+            this.state.shapes.forEach(shape => {
+                this.drawTheShapes(shape, this.state.mainContext)
+                this.drawTheShapes(shape, this.state.hitCtx)
+            })
+        }
+    }
+    drawTheShapes = (shape, context) => {
+        if (shape.radius) {
 
-        })
+            this.drawCircle(shape, context)
+
+        } else if (shape.width) {
+
+            this.drawRectangle(shape, context)
+        }
     }
     addToShapes = (shape) => {
         this.state.shapes.push(shape)
