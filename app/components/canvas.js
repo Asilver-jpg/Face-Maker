@@ -182,16 +182,12 @@ export default class Canvas extends React.Component {
     }
 
     deleteShape = (shape) => {
-        
-        let index = this.state.shapes.indexOf(shape)
-        console.log(index)
-        if (index > -1 && this.state.isDelete===false) {
-            let i= this.state.shapes.findIndex(s => s===shape)
-            let toDelete = this.state.shapes[i]
-            this.state.shapes.splice(i, 1)
-            let color = `rgb(${toDelete.color.r}, ${toDelete.color.g}, ${toDelete.color.b})`
+       
+        if ( this.state.isDelete===false) {
+            console.dir(shape)
+            let color = shape.colorKey
             delete this.state.colorsHash[color]
-            this.setState({isDelete:true})
+            this.setState({isDelete:true, shapes:[...this.state.shapes.filter(s=> s.colorKey!==shape.colorKey)]})
         }
     }
 

@@ -1,10 +1,14 @@
 /* Home Styles */
 
 .container {
-  display:flex;
+ 
   flex-direction:column;
   min-height:100vh;
   float:right;
+  width:100%;
+  
+  background-color: aqua;
+
 }
 
 
@@ -25,6 +29,8 @@
   transform : scaleX(-1);
   -ms-filter : fliph; /*IE*/
   filter : fliph; /*IE*/
+  float:right;
+  margin-left:30000px;
   
 }
 #container {

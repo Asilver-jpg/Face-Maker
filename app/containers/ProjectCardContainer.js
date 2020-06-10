@@ -9,7 +9,9 @@ export default class ProjectCardContainer extends React.Component {
     componentDidMount() {
         fetch(`${URL}/projects`)
             .then(response => response.json())
-            .then(data => this.setState({ profiles: data }))
+            .then(data => this.setState({ projects: data }))
+            .then(data => console.log(this.state.projects))
+ 
     }
 
 
@@ -17,7 +19,7 @@ export default class ProjectCardContainer extends React.Component {
         return (
             <div>
                 {this.state.projects.map((project) => {
-                    return <ProjectCard project={project}></ProjectCard>
+                    return <ProjectCard key={project.id} project={project}></ProjectCard>
                     })
                 }
             </div>

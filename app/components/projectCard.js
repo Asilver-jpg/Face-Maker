@@ -6,14 +6,14 @@ export default class ProjectCard extends React.Component{
 render(){
     return(
         <div>
-            <p>this.props.project.name</p>
-            {
-            /* <Link to={{
+            <p>{this.props.project.name}</p>
+            
+             <Link to={{
                 pathname: '/project',
                 state: {
                     project: this.props.project.id
                 }
-                }}>{this.props.project.name}</Link> */}
+                }}>{this.props.project.name}</Link> 
         </div>
     )
 }
