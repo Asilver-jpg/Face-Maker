@@ -179,7 +179,13 @@ export default class Home extends React.PureComponent {
     // start loop to draw face 
     this.drawLoop();
   }
-
+  stopVideo= ()=>{
+    this.state.vid.pause()
+    this.ctrack.stop()
+    this.setState({
+      trackinStarted: false
+    })
+  }
   drawLoop = () => {
     requestAnimFrame(this.drawLoop);
     this.state.overlayCC.clearRect(0, 0, this.state.vidWidth, this.state.vidHeight);
@@ -334,6 +340,8 @@ export default class Home extends React.PureComponent {
           <p>The angle of your face is : {Math.floor(this.state.noseAngle)}</p>
          <p>Nose is at position x:{this.state.nosePosition === "" ? " ":Math.floor(this.state.nosePosition[0])} y:{this.state.nosePosition===" "? " ": Math.floor(this.state.nosePosition[1])}</p>
           <button onClick={this.startVideo}>Start</button>
+          <button onClick={this.stopVideo}>Stop</button>
+
           <Canvas mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
         </div>
       </div>
