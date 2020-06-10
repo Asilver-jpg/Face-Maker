@@ -9,6 +9,8 @@ import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
 
 import Face from 'containers/Face/'
 import Test from 'containers/Test'
+import ProjectCardContainer from "../ProjectCardContainer"
+import ProjectContainer from "../projectContainer"
 import NotFound from 'containers/NotFound';
 
 
@@ -22,6 +24,9 @@ export default class App extends React.Component {
       <div>
      
       <Route exact path='/' component={Face}/>
+      <Route exact path='/p' component={ProjectCardContainer}/>
+      <Route exact path='/project' component={ProjectContainer}/>
+
       <Route exact path='/test' component={Test}/>
       </div>
     )}

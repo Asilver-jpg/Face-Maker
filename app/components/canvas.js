@@ -23,7 +23,9 @@ export default class Canvas extends React.Component {
         colorsHash: {},
         isPlaced: false,
         startWidth: 0,
-        startHeight: 0
+        startHeight: 0,
+        eyebrowsUp: false,
+        fromSelect: false
     }
 
     componentDidMount() {
@@ -31,12 +33,16 @@ export default class Canvas extends React.Component {
         let mainCanvas = document.querySelector("#canvas")
         let mainContext = mainCanvas.getContext("2d")
         let hitCanvas = document.createElement('canvas')
+        hitCanvas.width = 450
+        hitCanvas.height = 600
         let hitCtx = hitCanvas.getContext('2d')
+        let canvasDiv = document.getElementById("canvasDiv")
+        canvasDiv.appendChild(hitCanvas)
         let canvasWidth = mainCanvas.width
         let canvasHeight = mainCanvas.height
 
         let color = new Color(255, 0, 0)
-        let rect = new Rectangle(50, 50, 20, 20, color, 2)
+        let rect = new Rectangle(200, 200, 80, 80, color, 2)
         this.addToShapes(rect)
 
         this.setState({
@@ -48,6 +54,8 @@ export default class Canvas extends React.Component {
                 this.drawAllShapes()
             }
         )
+        console.dir(hitCanvas)
+
         this.state.loop
     }
     componentDidUpdate(prevProps, prevState) {
@@ -73,7 +81,7 @@ export default class Canvas extends React.Component {
                     y: this.getCanvasPointY(Math.floor(this.props.nosePosition[1]))
                 }
             }, () => {
-                this.manageMode()
+                //this.manageMode()
                 if (this.state.mode === "Edit") {
                     this.manageTransform()
                 } else if (this.state.mode === "Select") {
@@ -82,9 +90,9 @@ export default class Canvas extends React.Component {
                 this.managePlacement()
             })
         }
-       
+
         this.drawAllShapes()
-        if(this.state.mode==="Select"){
+        if (this.state.mode === "Select") {
             this.drawCursor(this.state.mainContext)
         }
     }
@@ -146,29 +154,36 @@ export default class Canvas extends React.Component {
     }
 
     manageSelect = () => {
-        if(!this.props.eyebrows){
-            this.setState({eyebrowsUp: false})
+        const pixel = this.state.hitCtx.getImageData(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 1, 1).data
+        const color = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
+        const shape = this.state.colorsHash[color];
+        if (!this.props.eyebrows) {
+            this.setState({ eyebrowsUp: false })
         }
-        if(this.state.activeShape!== "" && this.props.eyebrowsHeld && this.state.eyebrowsUp===false){
+        if(this.state.activeShape!== "" && this.props.eyebrowsHeld){
+                console.log("delete")
                 this.deleteShape(this.state.activeShape)
                 this.setState({fromSelect:false, eyebrowsUp: false, activeShape:""})
         }else 
-        if(this.props.eyebrows && this.state.eyebrowsUp===false){
-        
-            const pixel= this.state.hitCtx.getImageData(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 1,1).data
-            const color= `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
-            const shape= this.state.colorsHash[color];
-           
-                if(shape !== undefined){
-                    
-                    this.setState({activeShape:shape, eyebrowsUp: true, fromSelect:true})
-                }
-        }else if(this.shape=== undefined && this.props.eyebrows && this.state.activeShape!=="" && this.state.eyebrowsUp===false){
-            this.setState({activeShape:"", eyebrowsUp: true, fromSelect: false})
+        if (shape !== undefined && this.props.eyebrows && this.state.eyebrowsUp === false) {
+            console.log("Select")
+            this.setState({ activeShape: shape, eyebrowsUp: true, fromSelect: true })
+
+        } else if (shape === undefined && this.props.eyebrows && this.state.activeShape !== "" && this.state.eyebrowsUp === false) {
+            console.log("Deselect")
+            this.setState({ activeShape: "", eyebrowsUp: true, fromSelect: false })
         }
     }
 
-    
+    deleteShape = (shape) => {
+        let index = this.state.shapes.indexOf(shape)
+        if (index > -1) {
+            let toDelete = this.state.shapes[index]
+            this.state.shapes.splice(index, 1)
+            let color = `rgb(${toDelete.color.r}, ${toDelete.color.g}, ${toDelete.color.b})`
+            delete this.state.colorsHash[color]
+        }
+    }
 
     //mapping functions
     getCanvasPointX = (value) => {
@@ -224,32 +239,31 @@ export default class Canvas extends React.Component {
     }
 
     drawRectangle = (shape, context) => {
-        context.beginPath()
-        context.translate(shape.posX + (shape.width / 2), shape.posY + (shape.height / 2))
-        context.rotate((-1 * shape.rotation * Math.PI / 180))
-        context.rect(0, 0, shape.width, shape.height)
 
         if (context.canvas.id) {
             context.lineWidth = shape.lineWidth
             context.strokeStyle = shape.strokeStyle
             context.stroke()
             context.fillStyle = `rgb(${shape.color.r}, ${shape.color.g}, ${shape.color.b})`;
-            context.fill()
         } else {
             context.fillStyle = shape.colorKey
-            context.fill()
         }
+        context.beginPath()
+        context.translate(shape.posX + (shape.width / 2), shape.posY + (shape.height / 2))
+        context.rotate((-1 * shape.rotation * Math.PI / 180))
+        context.fillRect(0, 0, shape.width, shape.height)
+
         context.resetTransform()
     }
-    drawCursor=(context)=>{
+    drawCursor = (context) => {
         let radius = 5;
         context.beginPath();
         context.arc(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, radius, 0, 2 * Math.PI, false);
-        context.lineWidth=3;
+        context.lineWidth = 3;
         context.strokeStyle = "#000000"
         context.stroke()
-        
-       
+
+
 
 
     }
@@ -304,7 +318,7 @@ export default class Canvas extends React.Component {
 
         return (
 
-            <div>
+            <div id="canvasDiv">
                 <canvas id="canvas" height="600" width="450"></canvas>
                 <p>{this.state.mode}</p>
             </div>

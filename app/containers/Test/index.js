@@ -177,6 +177,13 @@ export default class Home extends React.PureComponent {
     // start loop to draw face 
     this.drawLoop();
   }
+  stopVideo= ()=>{
+    this.state.vid.pause()
+    this.ctrack.stop()
+    this.setState({
+      trackinStarted: false
+    })
+  }
 
   drawLoop = () => {
     requestAnimFrame(this.drawLoop);
@@ -329,6 +336,7 @@ export default class Home extends React.PureComponent {
           <p>Your mouth is this many pixels open: {Math.floor(this.state.mouthDist)}</p>
           <p>The angle of your face is : {Math.floor(this.state.noseAngle)}</p>
           <button onClick={this.startVideo}>Start</button>
+          <button onClick={this.stopVideo}>Stop</button>
         </div>
       </div>
     );
