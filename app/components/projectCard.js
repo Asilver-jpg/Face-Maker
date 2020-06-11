@@ -9,10 +9,8 @@ render(){
             <p>{this.props.project.name}</p>
             
              <Link to={{
-                pathname: '/project',
-                state: {
-                    project: this.props.project.id
-                }
+                pathname: `/project/${this.props.project.id}`,
+                
                 }}>{this.props.project.name}</Link> 
         </div>
     )

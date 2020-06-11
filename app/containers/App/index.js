@@ -25,7 +25,7 @@ export default class App extends React.Component {
      
       <Route exact path='/' component={Face}/>
       <Route exact path='/p' component={ProjectCardContainer}/>
-      <Route exact path='/project' component={ProjectContainer}/>
+      <Route exact path='/project/:id' component={ProjectContainer}/>
 
       <Route exact path='/test' component={Test}/>
       </div>

@@ -26,11 +26,13 @@ export default class Canvas extends React.Component {
         startHeight: 0,
         eyebrowsUp: false,
         fromSelect: false,
-        isDelete:false
+        isDelete:false,
+        project:""
     }
 
     componentDidMount() {
         //rect posX, posY, width, height, fill, stroke, strokeWeight
+        let id= window.location.href[window.location.href.length-1]
         let mainCanvas = document.querySelector("#canvas")
         let mainContext = mainCanvas.getContext("2d")
         let hitCanvas = document.createElement('canvas')
@@ -48,6 +50,16 @@ export default class Canvas extends React.Component {
         this.addToShapes(rect)
         this.addToShapes(rect2)
 
+        let isNum= /^\d+$/
+        if(isNum.test(id)){
+            console.log("IS FETCJHING")
+            fetch(`${URL}/projects/${id}`)
+            .then(response => response.json())
+            .then(data => this.setState({ mainCanvas: mainCanvas, mainContext: mainContext, project: data, id: window.location.href[window.location.href.length-1], canvasWidth: canvasWidth, canvasHeight: canvasHeight,
+                 }))
+        }
+        else{
+
         this.setState({
             mainCanvas: mainCanvas, mainContext: mainContext, hitCtx: hitCtx, canvasWidth: canvasWidth, canvasHeight: canvasHeight,
             stroke: this.hexToRgb("#003300"), fill: this.hexToRgb("#00FF00"), loop: setInterval(this.draw, 3)
@@ -57,8 +69,8 @@ export default class Canvas extends React.Component {
                 this.drawAllShapes()
             }
         )
-        console.dir(hitCanvas)
-
+     
+        }
         this.state.loop
     }
     componentDidUpdate(prevProps, prevState) {
@@ -297,7 +309,10 @@ export default class Canvas extends React.Component {
             for (let i = 0; i < this.state.shapes.length-1; i++) {
                     this.drawTheShapes(this.state.shapes[i], this.state.hitCtx) 
             }
-        } else {
+        }else if( this.state.mode=== undefined){
+            this.drawTheShapes(shape, this.state.mainContext)
+
+     } else {
             this.state.shapes.forEach(shape => {
                 this.drawTheShapes(shape, this.state.mainContext)
                 this.drawTheShapes(shape, this.state.hitCtx)
