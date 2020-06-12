@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { Router } from 'react-router-dom';
+import history from "./components/history"
 
 import '!file-loader?name=[name].[ext]!./favicon.ico';
 import '!file-loader?name=[name].[ext]!./manifest.json';
@@ -8,9 +9,9 @@ import '!file-loader?name=[name].[ext]!./manifest.json';
 import App from 'containers/App';
 
 ReactDOM.render((
-  <BrowserRouter>
+  <Router history={history}>
     <App className='App'/>
-  </BrowserRouter>
+  </Router>
 ), document.getElementById('app'));
 
 if (process.env.NODE_ENV === 'production') {

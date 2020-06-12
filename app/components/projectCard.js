@@ -6,6 +6,7 @@ export default class ProjectCard extends React.Component{
 render(){
     return(
         <div>
+          
             <p>{this.props.project.name}</p>
             
              <Link to={{
