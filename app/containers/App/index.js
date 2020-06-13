@@ -14,6 +14,7 @@ import ProjectContainer from "../projectContainer"
 import PortfolioContainer from "../portfolioContainer"
 import NewContainer from "../newContainer"
 import Login from "../../components/login"
+import ColorPicker from "../../components/colorPicker"
 import NotFound from 'containers/NotFound';
 
 
@@ -27,7 +28,7 @@ export default class App extends React.Component {
       <div>
         
       <Route exact path='/' component={sessionStorage.getItem("username") ? ProjectCardContainer : Login }/>
-      <Route exact path='/p' component={ProjectCardContainer}/>
+      <Route exact path='/p' component={ColorPicker}/>
       <Route exact path='/project/:id' component={ProjectContainer}/>
       <Route exact path='/portfolio' component={PortfolioContainer}/>
       <Route exact path='/new' component={NewContainer}/>

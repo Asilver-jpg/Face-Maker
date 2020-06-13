@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <title>Color Picker</title>
+    <link href="color-picker.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <p>Show and hide color picker panel with double click.</p>
+    <p><input type="text"></p>
+    <script src="color-picker.min.js"></script>
+    <script>
+
+    var picker = new CP(document.querySelector('input'));
+
+    // Disable the default blur and focus behavior
+    picker.on('blur', function() {});
+    picker.on('focus', function() {});
+
+    picker.on('change', function(r, g, b, a) {
+        this.source.value = this.color(r, g, b, a);
+    });
+
+    picker.source.addEventListener('dblclick', function(e) {
+        picker.enter();
+        e.stopPropagation();
+    }, false);
+
+    document.documentElement.addEventListener('dblclick', function() {
+        picker.exit();
+    }, false);
+
+    </script>
+  </body>
+</html>

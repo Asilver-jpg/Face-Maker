@@ -1,6 +1,7 @@
 import React from 'react';
 import "./components.css"
 import CanvasDetails from "./canvasDetails.js"
+import ColorPicker from "./colorPicker.js"
 const URL = "http://localhost:3001"
 const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
 //has props of faceToMove, eyebrows, eyebrowsHeld, noseScrunch, noseScrunchHeld and noseAngle
@@ -33,7 +34,8 @@ export default class Canvas extends React.Component {
         project: "",
         isMine: false,
         toRemove:[],
-        activeShapePreviousColor:""
+        activeShapePreviousColor:"",
+
     }
 
     componentDidMount() {
@@ -50,7 +52,7 @@ export default class Canvas extends React.Component {
         let canvasWidth = mainCanvas.width
         let canvasHeight = mainCanvas.height
         let canvasDiv= document.querySelector("#canvasDiv")
-        canvasDiv.appendChild(hitCanvas)
+        //canvasDiv.appendChild(hitCanvas)
         let color = new Color(255, 0, 0)
        
         let isNum = /^\d+$/
@@ -114,6 +116,8 @@ export default class Canvas extends React.Component {
                     this.manageTransform()
                 } else if (this.state.mode === "Select") {
                     this.manageSelect()
+                }else if(this.state.mode=== "Shape Settings"){
+                    this.manageShapeSettings()
                 }
                 this.managePlacement()
             })
@@ -121,7 +125,6 @@ export default class Canvas extends React.Component {
         if (this.props.eyebrows === false) {
             this.setState({ toDelete: false })
         }
-
         this.drawAllShapes()
         if (this.state.mode === "Select") {
             this.drawCursor(this.state.mainContext)
@@ -129,7 +132,6 @@ export default class Canvas extends React.Component {
     }
 
     clearCanvas = (context) => {
-
         context.clearRect(0, 0, 450, 600)
     }
     //shape management functions
@@ -142,9 +144,9 @@ export default class Canvas extends React.Component {
 
             switch (this.state.mode) {
                 case "Edit":
-                    this.setState({ mode: "Direct Edit", noseIsScrunched: 0 })
+                    //this.setState({ mode: "Shape Settings", noseIsScrunched: 0 })
                     break;
-                case "Direct Edit":
+                case "Shape Settings":
                     this.setState({ mode: "Edit", noseIsScrunched: 0 })
                     break;
                 case "Select":
@@ -157,14 +159,12 @@ export default class Canvas extends React.Component {
     }
     //posX, posY, width, height, fill, stroke, strokeWeight
     manageTransform = () => {
-
         if (this.state.activeShape === "") {
             let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, this.state.fill, this.state.stroke, this.state.strokeWeight, 0)
             this.addToShapes(newShape)
             this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
         } else {
             this.setActiveShapeFill(this.state.activeShapePreviousColor)
-
             let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
                                                this.state.startHeight + this.getRectDimensions(this.props.mouthDist), this.state.fill, this.state.stroke,
                                                this.state.strokeWeight, this.props.noseAngle * 2)
@@ -199,7 +199,6 @@ export default class Canvas extends React.Component {
         } else
             if (shape !== undefined && this.props.eyebrows && this.state.eyebrowsUp === false) {
                 console.log("Select")
-               
                 this.setState({ activeShape: shape, eyebrowsUp: true, fromSelect: true }, ()=>{ this.setActiveShapeFill("(0,0,0)")})
 
             } else if (shape === undefined && this.props.eyebrows && this.state.activeShape !== "" && this.state.eyebrowsUp === false) {
@@ -222,6 +221,30 @@ export default class Canvas extends React.Component {
             let colorCopy = { ...this.state.colorHash }
             delete colorCopy[color]
             this.setState({ toRemove: toDeleteArr,colorsHash: colorCopy, isDelete: true, shapes: [...this.state.shapes.filter(s => s.colorKey !== shape.colorKey)] })
+        }
+    }
+
+    manageShapeSettings=()=>{
+        let activeShape= this.state.activeShape
+        let shapesArr = [...this.state.shapes]
+        if (!this.props.eyebrows) {
+            this.setState({ eyebrowsUp: false })
+        }
+        if(this.props.eyebrows && this.state.eyebrowsUp===false){
+            this.setState({shapeToUse: !(this.state.shapeToUse)}, () => {
+                if(this.state.shapeToUse===true){
+                    //make circle
+                    let circle= new Circle(activeShape.posX, activeShape.posY, activeShape.width/2,this.state.fill, this.state.stroke ,0)
+                    shapesArr[shapesArr.length-1] =circle
+                    this.setState({shapes:shapesArr, eyebrowsUp:true})
+                }else{
+                    //make rectangle
+                    let rectangle= new Rectangle(activeShape.posX, activeShape.posY, activeShape.radius*2, activeShape.radius*2,this.state.fill, this.state.stroke ,0 )
+                    shapesArr[shapesArr.length-1] =rectangle
+                    this.setState({shapes:shapesArr}, eyebrowsUp:true)
+
+                }
+            })
         }
     }
 
@@ -458,12 +481,18 @@ export default class Canvas extends React.Component {
         id = id[0].slice(1)
         return id
     }
+
+    changeFillColor=(color)=>{
+            this.setState({fill: this.hexToRgb(color.hex)})
+          
+    }
     render() {
 
         return (
             <div id="canvasDiv">
                 <canvas id="canvas" height="600" width="450"></canvas>
                 <CanvasDetails mode= {this.state.mode}save={this.save} project={this.state.project} isMine={this.state.isMine}/>
+                <ColorPicker changeFillColor= {this.changeFillColor}/>
             </div>
 
         )
