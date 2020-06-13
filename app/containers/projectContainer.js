@@ -1,7 +1,7 @@
 import React from 'react';
-import Canvas from "../components/canvas"
+import Face from "./Face"
 
 function ProjectContainer(props){
-    return <Canvas/>
+    return <Face/>
 }
 export default ProjectContainer

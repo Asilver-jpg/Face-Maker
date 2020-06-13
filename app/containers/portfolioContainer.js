@@ -1,8 +1,32 @@
 import React from 'react';
-import Project from "../components/project.js"
-import Canvas from "../components/canvas"
+import ProjectCard from "../components/projectCard.js"
+import Navbar from "../components/navbar"
 
-function PortfolioContainer(props){
+const URL = "http://localhost:3001"
+
+export default class PortfolioContainer extends React.Component {
+    state = {
+        user: ""
+    }
+    componentDidMount() {
+        fetch(`${URL}/users/${sessionStorage.getItem("user_id")}`)
+            .then(response => response.json())
+            .then(data => this.setState({ user: data }))
+            .then(data => console.log(this.state.user))
+ 
+    }
+
+
+    render() {
+        return (
+            <div>
+                 <Navbar></Navbar>
+              {this.state.user.projects.map((project) => {
+                    return <ProjectCard key={project.id} project={project}></ProjectCard>
+                    })
+                }
+            </div>
+            )
+        }
+    }
     
-}
-export default PortfolioContainer
