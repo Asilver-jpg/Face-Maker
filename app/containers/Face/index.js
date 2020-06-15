@@ -259,7 +259,6 @@ export default class Home extends React.PureComponent {
   }
 
   determineNoseScrunched = (nose) => {
-    console.log(this.state.noseStart-nose)
     if (this.state.noseStart - nose > 3) {
       this.setState({ noseScrunch: true })
     } else {
@@ -278,7 +277,7 @@ export default class Home extends React.PureComponent {
     }
   }
   determineEyebrowsUp = (left, right) => {
-    if (this.state.leftEyebrowDist - this.state.leftEyebrowPrev > 5 || this.state.rightEyebrowDist - this.state.rightEyebrowPrev > 5) {
+    if (this.state.leftEyebrowDist - this.state.leftEyebrowPrev > 7|| this.state.rightEyebrowDist - this.state.rightEyebrowPrev > 7) {
       this.setState({ eyebrows: true })
     } else {
       this.setState({ eyebrows: false })

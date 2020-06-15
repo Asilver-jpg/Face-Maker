@@ -1,6 +1,7 @@
 import React from 'react';
 import "./components.css"
 import CanvasDetails from "./canvasDetails.js"
+import Controls from "./controls"
 const URL = "http://localhost:3001"
 const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
 //has props of faceToMove, eyebrows, eyebrowsHeld, noseScrunch, noseScrunchHeld and noseAngle
@@ -61,7 +62,7 @@ export default class Canvas extends React.Component {
                     if (data.user_id.toString() === sessionStorage.getItem("user_id")) {
                         this.setState({
                             mainCanvas: mainCanvas, mainContext: mainContext, hitCtx: hitCtx, canvasWidth: canvasWidth, canvasHeight: canvasHeight,
-                            stroke: this.hexToRgb("#003300"), fill: this.hexToRgb("#00FF00"), project:data, loop: setInterval(this.draw, 3), mode: "Edit", isMine: true
+                            stroke: this.hexToRgb("#003300"), fill: this.hexToRgb("#00FF00"), project:data, loop: setInterval(this.draw, 3), mode: "Select", isMine: true
                         })
                     } else {
                         this.setState({ mainCanvas: mainCanvas, mainContext: mainContext, project: data, id: window.location.href[window.location.href.length - 1], canvasWidth: canvasWidth, canvasHeight: canvasHeight })
@@ -140,19 +141,26 @@ export default class Canvas extends React.Component {
             this.setState({ noseIsScrunched: 2 })
         } else if (this.state.noseIsScrunched === 1 && this.props.noseScrunch === false) {
 
-            switch (this.state.mode) {
-                case "Edit":
-                    this.setState({ mode: "Direct Edit", noseIsScrunched: 0 })
-                    break;
-                case "Direct Edit":
-                    this.setState({ mode: "Edit", noseIsScrunched: 0 })
-                    break;
-                case "Select":
-                    this.setState({ mode: "Edit", noseIsScrunched: 0, activeShape: "" })
-                    break;
-            }
+            // switch (this.state.mode) {
+            //     case "Edit":
+            //         this.setState({ mode: "Direct Edit", noseIsScrunched: 0 })
+            //         break;
+            //     case "Direct Edit":
+            //         this.setState({ mode: "Edit", noseIsScrunched: 0 })
+            //         break;
+            //     case "Select":
+            //         this.setState({ mode: "Edit", noseIsScrunched: 0, activeShape: "" })
+            //         break;
+            //}
         } else if (this.state.noseIsScrunched === 2 && this.props.noseScrunch === false) {
+           switch (this.state.mode){
+               case "Edit":
             this.setState({ mode: "Select", noseIsScrunched: 0 })
+            break;
+            case "Select":
+            this.setState({mode: "Edit", noseIsScrunched: 0})
+            break;
+           }
         }
     }
     //posX, posY, width, height, fill, stroke, strokeWeight
@@ -190,12 +198,14 @@ export default class Canvas extends React.Component {
         const pixel = this.state.hitCtx.getImageData(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 1, 1).data
         const color = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
         const shape = this.state.colorsHash[color];
+        console.log(this.state.activeShape !== "")
         if (!this.props.eyebrows) {
             this.setState({ eyebrowsUp: false })
         }
         if (this.state.activeShape !== "" && this.props.eyebrowsHeld) {
+            console.log("Deleting")
             this.deleteShape(this.state.activeShape)
-            this.setState({ fromSelect: false, eyebrowsUp: false, activeShape: "" })
+            this.setState({ fromSelect: false, eyebrowsUp: true, activeShape: "" })
         } else
             if (shape !== undefined && this.props.eyebrows && this.state.eyebrowsUp === false) {
                 console.log("Select")
@@ -209,17 +219,18 @@ export default class Canvas extends React.Component {
             }
     }
 
+  
     deleteShape = (shape) => {
 
         if (this.state.isDelete === false) {
-            let toDeleteArr=[]
+            let toDeleteArr={}
             if(shape.id){
              toDeleteArr= [...this.state.toDelete,shape]
             }else{
-                 toDeleteArr= {...this.state.toDelete}
+                 toDeleteArr= [...this.state.toDelete]
             }
             let color = shape.colorKey
-            let colorCopy = { ...this.state.colorHash }
+            let colorCopy = { ...this.state.colorsHash }
             delete colorCopy[color]
             this.setState({ toRemove: toDeleteArr,colorsHash: colorCopy, isDelete: true, shapes: [...this.state.shapes.filter(s => s.colorKey !== shape.colorKey)] })
         }
@@ -440,7 +451,6 @@ export default class Canvas extends React.Component {
             .then(json=> console.log(json)) 
            }
         })
-
         this.state.toRemove.forEach(shape=>{
             this.removeShapeFromBackend(shape)
         })
@@ -464,6 +474,7 @@ export default class Canvas extends React.Component {
             <div id="canvasDiv">
                 <canvas id="canvas" height="600" width="450"></canvas>
                 <CanvasDetails mode= {this.state.mode}save={this.save} project={this.state.project} isMine={this.state.isMine}/>
+                <Controls mode={this.state.mode}/>
             </div>
 
         )
