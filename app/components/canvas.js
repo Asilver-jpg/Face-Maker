@@ -168,8 +168,11 @@ export default class Canvas extends React.Component {
             let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
                                                this.state.startHeight + this.getRectDimensions(this.props.mouthDist), this.state.fill, this.state.stroke,
                                                this.state.strokeWeight, this.props.noseAngle * 2)
-            this.state.shapes[this.state.shapes.length - 1] = editedNewShape
-            this.setState({ activeShape: editedNewShape })
+           
+            let shapesArr= [...this.state.shapes]
+            shapesArr.pop()
+            shapesArr.push(editedNewShape)
+            this.setState({ activeShape: editedNewShape, shapes: shapesArr })
         }
     }
 
@@ -306,8 +309,7 @@ export default class Canvas extends React.Component {
             context.lineWidth = shape.lineWidth
             context.strokeStyle = shape.strokeStyle
             context.stroke()
-            let colors = `rgb${color}`
-
+            let colors = `rgb${shape.color}`
             context.fillStyle = colors
             context.fill()
         } else {
@@ -366,6 +368,7 @@ export default class Canvas extends React.Component {
     drawAllShapes = () => {
 
         if (this.state.mode === "Edit") {
+            const filter= this.state.shapes.filter((shape)=>shape.color===this.state.fill)
             this.state.shapes.forEach(shape => {
                 this.drawTheShapes(shape, this.state.mainContext, shape.color)
             })
@@ -483,7 +486,8 @@ export default class Canvas extends React.Component {
     }
 
     changeFillColor=(color)=>{
-            this.setState({fill: this.hexToRgb(color.hex)})
+        let colorRGB=this.hexToRgb(color.hex)
+            this.setState({fill: `(${colorRGB.r},${colorRGB.g},${colorRGB.b})`})
           
     }
     render() {
