@@ -1,9 +1,8 @@
 import React from 'react';
 import ProjectCard from "../components/projectCard.js"
 import Navbar from "../components/navbar"
-
+import LoadingScreen from  "../components/loadingScreen.js"
 const URL = "http://localhost:3001"
-
 export default class PortfolioContainer extends React.Component {
     state = {
         user: ""
@@ -18,12 +17,16 @@ export default class PortfolioContainer extends React.Component {
 
 
     render() {
+        const projectRender= this.state.user.projects.map((project) => {
+            return <ProjectCard key={project.id} project={project}></ProjectCard>
+                 })
+        
         return (
             <div>
+                
                  <Navbar></Navbar>
-              {this.state.user.projects.map((project) => {
-                    return <ProjectCard key={project.id} project={project}></ProjectCard>
-                    })
+                 {this.state.user==="" ? <LoadingScreen/>: projectRender}
+           
                 }
             </div>
             )
