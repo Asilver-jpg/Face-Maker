@@ -331,16 +331,19 @@ export default class Home extends React.PureComponent {
   setShouldRender=(val)=>{
     this.setState({shouldRender: val})
   }
-
+  eyebrowsButton= (e) =>{
+    console.log(e)
+    this.setState({eyebrows :true})
+  }
   render() {
     if(this.state.shouldRender===false){
       return(<Canvas shouldRender={this.state.shouldRender} setShouldRender = {this.setShouldRender}mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
         )
     }else{
     return (
-      <div className="container">
+      <div className="container" onKeyDown= {this.eyebrowsButton}>
         <Helmet title="Home" meta={[{ name: 'description', content: 'Description of Home' }]} />
-        <div id="container">
+        <div id="container" onKeyDown= {this.eyebrowsButton}>
           <video id="videoel" width="400" height="300" preload="auto" loop playsInline autoPlay></video>
           <canvas id="overlay" width="400" height="300"></canvas>
           <p>{this.state.faceToMove === 0 ? "You do not need to move" : this.state.faceToMove === 1 ? "You are too far away" : "You are too close"}</p>
