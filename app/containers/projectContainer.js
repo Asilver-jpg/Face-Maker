@@ -1,7 +1,7 @@
 import React from 'react';
-import Project from "../components/project.js"
+import Face from "./Face"
 
 function ProjectContainer(props){
-    return <Project></Project>
+    return <Face/>
 }
 export default ProjectContainer

@@ -49,10 +49,12 @@ export default class Home extends React.PureComponent {
       //face
       faceDirection: "still",
       faceToMove: "",
-      faceWidth: 0,
+      faceWidth: "",
       faceWidthStart: 0, 
       //other
-      setTimeout: false
+      setTimeout: false,
+      shouldRender: true,
+      cp:""
     }
   }
  
@@ -63,6 +65,8 @@ export default class Home extends React.PureComponent {
   }
 
   componentDidMount() {
+    console.log(this.state.shouldRender)
+    if(this.state.shouldRender===true){
     let vid = document.getElementById('videoel');
     let overlay = document.getElementById('overlay');
     let overlayCC = overlay.getContext('2d');
@@ -90,9 +94,11 @@ export default class Home extends React.PureComponent {
     }
     vid.addEventListener('canplay', this.enablestart, false);
   }
-  componentDidUpdate() {
-    if (this.props.isRunning) {
-      this.startVideo()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(prevState !== this.state){
+      this.setState({shouldRender:this.state.shouldRender})
     }
   }
 
@@ -179,13 +185,10 @@ export default class Home extends React.PureComponent {
     // start loop to draw face 
     this.drawLoop();
   }
-  stopVideo= ()=>{
-    this.state.vid.pause()
-    this.ctrack.stop()
-    this.setState({
-      trackinStarted: false
-    })
-  }
+  setFaceWidthStart= ()=>{
+    this.setState({faceWidthStart: this.state.faceWidth ,noseStart: this.state.noseDist})
+    }
+  
   drawLoop = () => {
     requestAnimFrame(this.drawLoop);
     this.state.overlayCC.clearRect(0, 0, this.state.vidWidth, this.state.vidHeight);
@@ -210,8 +213,8 @@ export default class Home extends React.PureComponent {
       //set defaults when face is found
       if (this.state.noseNorm === null) {
         this.setState({
-          noseNorm: noseLength, nosePrev: noseLength, rightEyebrowDist: rightEyebrowDist, leftEyebrowDist: leftEyebrowDist, mouthDist: mouthDistance, noseAngle: angle,
-          leftEyebrowPrev: leftEyebrowDist, rightEyebrowPrev: rightEyebrowDist, noseStart: noseLength, faceWidth: faceWidth, faceWidthStart: faceWidth, nosePosition: cp[62],
+          cp: cp,noseNorm: noseLength, nosePrev: noseLength, rightEyebrowDist: rightEyebrowDist, leftEyebrowDist: leftEyebrowDist, mouthDist: mouthDistance, noseAngle: angle,
+          leftEyebrowPrev: leftEyebrowDist, rightEyebrowPrev: rightEyebrowDist, faceWidth: faceWidth,  nosePosition: cp[62],
           eyebrowCounter: setInterval(() => { this.setState({ eyebrowCounter: this.state.eyebrowCounter + 1 }) }, 500),
           noseCounter: setInterval(() => { this.setState({ noseCounter: this.state.noseCounter + 1 }) }, 500)
         })
@@ -228,7 +231,9 @@ export default class Home extends React.PureComponent {
       this.setState({  faceWidth: faceWidth, leftEyebrowDist: leftEyebrowDist, rightEyebrowDist: rightEyebrowDist, noseDist: noseLength, nosePosition:cp[62] })
       }
       //check if face is too far, too close or in right position
+      if(this.state.faceWidthStart!== ""){
       this.isCloseToStart()
+      }
       //if face is in the right position do things
       if (this.state.faceToMove === 0) {
         this.determineEyebrowsUp(leftEyebrowDist, rightEyebrowDist)
@@ -254,7 +259,6 @@ export default class Home extends React.PureComponent {
   }
 
   determineNoseScrunched = (nose) => {
-
     if (this.state.noseStart - nose > 3) {
       this.setState({ noseScrunch: true })
     } else {
@@ -273,7 +277,7 @@ export default class Home extends React.PureComponent {
     }
   }
   determineEyebrowsUp = (left, right) => {
-    if (this.state.leftEyebrowDist - this.state.leftEyebrowPrev > 7 || this.state.rightEyebrowDist - this.state.rightEyebrowPrev > 7) {
+    if (this.state.leftEyebrowDist - this.state.leftEyebrowPrev > 7|| this.state.rightEyebrowDist - this.state.rightEyebrowPrev > 7) {
       this.setState({ eyebrows: true })
     } else {
       this.setState({ eyebrows: false })
@@ -323,12 +327,23 @@ export default class Home extends React.PureComponent {
     let pi = 3.14159265359
     return radians * 180 / pi
   }
-
+  //function to pass down
+  setShouldRender=(val)=>{
+    this.setState({shouldRender: val})
+  }
+  eyebrowsButton= (e) =>{
+    console.log(e)
+    this.setState({eyebrows :true})
+  }
   render() {
+    if(this.state.shouldRender===false){
+      return(<Canvas shouldRender={this.state.shouldRender} setShouldRender = {this.setShouldRender}mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
+        )
+    }else{
     return (
-      <div className="container">
+      <div className="container" onKeyDown= {this.eyebrowsButton}>
         <Helmet title="Home" meta={[{ name: 'description', content: 'Description of Home' }]} />
-        <div id="container">
+        <div id="container" onKeyDown= {this.eyebrowsButton}>
           <video id="videoel" width="400" height="300" preload="auto" loop playsInline autoPlay></video>
           <canvas id="overlay" width="400" height="300"></canvas>
           <p>{this.state.faceToMove === 0 ? "You do not need to move" : this.state.faceToMove === 1 ? "You are too far away" : "You are too close"}</p>
@@ -339,13 +354,14 @@ export default class Home extends React.PureComponent {
           <p>Your mouth is this many pixels open: {Math.floor(this.state.mouthDist)}</p>
           <p>The angle of your face is : {Math.floor(this.state.noseAngle)}</p>
          <p>Nose is at position x:{this.state.nosePosition === "" ? " ":Math.floor(this.state.nosePosition[0])} y:{this.state.nosePosition===" "? " ": Math.floor(this.state.nosePosition[1])}</p>
-          <button onClick={this.startVideo}>Start</button>
-          <button onClick={this.stopVideo}>Stop</button>
+          <button onClick={this.startVideo}>Start Video</button>
+          <button onClick={this.setFaceWidthStart}>Start Drawing</button>
 
-          <Canvas mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
+          <Canvas shouldRender={this.state.shouldRender}setShouldRender = {this.setShouldRender}mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
         </div>
       </div>
     );
+    }
   }
 }
 
