@@ -1,14 +1,16 @@
 import React from 'react'
 import reactCSS from 'reactcss'
+import "./components.css"
+
 import { SketchPicker } from 'react-color'
 
 class ColorPicker extends React.Component {
   state = {
     displayColorPicker: false,
     color: {
-      r: '241',
-      g: '112',
-      b: '19',
+      r: '0',
+      g: '255',
+      b: '0',
       a: '1',
     },
   };
@@ -59,9 +61,10 @@ class ColorPicker extends React.Component {
     });
 
     return (
-      <div>
+      <div id= "colorPicker">
+          Color: 
         <div style={ styles.swatch } onClick={ this.handleClick }>
-          <div style={ styles.color } />
+        <div style={ styles.color } />
         </div>
         { this.state.displayColorPicker ? <div style={ styles.popover }>
           <div style={ styles.cover } onClick={ this.handleClose }/>

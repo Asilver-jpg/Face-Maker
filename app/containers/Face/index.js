@@ -8,9 +8,10 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import Canvas from "../../components/canvas"
 import clm from 'clmtrackr';
+import NavBar from "../../components/navbar"
 
 import './style.css';
-import './styleM.css';
+
 
 export default class Home extends React.PureComponent {
 
@@ -344,21 +345,23 @@ export default class Home extends React.PureComponent {
     }else{
     return (
       <div className="container" onKeyDown= {this.eyebrowsButton}>
+        <NavBar/>
         <Helmet title="Home" meta={[{ name: 'description', content: 'Description of Home' }]} />
         <div id="container" onKeyDown= {this.eyebrowsButton}>
+          <div id="video">
           <video id="videoel" width="400" height="300" preload="auto" loop playsInline autoPlay></video>
           <canvas id="overlay" width="400" height="300"></canvas>
           <p>{this.state.faceToMove === 0 ? "You do not need to move" : this.state.faceToMove === 1 ? "You are too far away" : "You are too close"}</p>
-          <p>{this.state.eyebrows ? "Eyebrows are up" : "Eyebrows are down"}</p>
+          {/* <p>{this.state.eyebrows ? "Eyebrows are up" : "Eyebrows are down"}</p>
           <p>{this.state.eyebrowsHeld ? "Eyebrows are held" : "Eyebrows are not held"}</p>
           <p>{this.state.noseScrunch ? "Nose is scrunched" : "Nose is not scrunched"}</p>
           <p>{this.state.noseScrunchHeld ? "Nose scrunched is held" : "Nose scrunched is not held"}</p>
           <p>Your mouth is this many pixels open: {Math.floor(this.state.mouthDist)}</p>
           <p>The angle of your face is : {Math.floor(this.state.noseAngle)}</p>
-         <p>Nose is at position x:{this.state.nosePosition === "" ? " ":Math.floor(this.state.nosePosition[0])} y:{this.state.nosePosition===" "? " ": Math.floor(this.state.nosePosition[1])}</p>
+         <p>Nose is at position x:{this.state.nosePosition === "" ? " ":Math.floor(this.state.nosePosition[0])} y:{this.state.nosePosition===" "? " ": Math.floor(this.state.nosePosition[1])}</p> */}
           <button onClick={this.startVideo}>Start Video</button>
           <button onClick={this.setFaceWidthStart}>Start Drawing</button>
-
+          </div>
           <Canvas shouldRender={this.state.shouldRender}setShouldRender = {this.setShouldRender}mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
         </div>
       </div>

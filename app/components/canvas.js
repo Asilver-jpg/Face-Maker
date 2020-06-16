@@ -55,7 +55,6 @@ export default class Canvas extends React.Component {
         let canvasWidth = mainCanvas.width
         let canvasHeight = mainCanvas.height
 
-        let color = new Color(255, 0, 0)
 
         let isNum = /^\d+$/
         if (isNum.test(id)) {
@@ -65,7 +64,7 @@ export default class Canvas extends React.Component {
                     if (data.user_id.toString() === sessionStorage.getItem("user_id")) {
                         this.setState({
                             mainCanvas: mainCanvas, mainContext: mainContext, hitCtx: hitCtx, canvasWidth: canvasWidth, canvasHeight: canvasHeight,
-                            stroke: this.hexToRgb("#003300"), fill: this.hexToRgb("#00FF00"), project: data, loop: setInterval(this.draw, 3), mode: "Select", isMine: true
+                            stroke: this.hexToRgb("#003300"), fill: this.hexToRgb("#00FF00"), project: data, loop: setInterval(this.draw, 3), mode: "Edit", isMine: true
                         })
                     } else {
                         this.setState({ mainCanvas: mainCanvas, mainContext: mainContext, project: data, id: window.location.href[window.location.href.length - 1], canvasWidth: canvasWidth, canvasHeight: canvasHeight })
@@ -101,7 +100,6 @@ export default class Canvas extends React.Component {
 
     //called every 3 milliseconds
     draw = () => {
-
         //console.log(this.props.nosePosition[0])
         this.clearCanvas(this.state.mainContext)
 
@@ -168,14 +166,15 @@ export default class Canvas extends React.Component {
     }
     //posX, posY, width, height, fill, stroke, strokeWeight
     manageTransform = () => {
+        let color = `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b})`
         if (this.state.activeShape === "") {
-            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, this.state.fill, this.state.stroke, this.state.strokeWeight, 0)
+            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, color, this.state.stroke, this.state.strokeWeight, 0)
             this.addToShapes(newShape)
             this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
         } else {
             this.setActiveShapeFill(this.state.activeShapePreviousColor)
             let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
-                this.state.startHeight + this.getRectDimensions(this.props.mouthDist), this.state.fill, this.state.stroke,
+                this.state.startHeight + this.getRectDimensions(this.props.mouthDist), color, this.state.stroke,
                 this.state.strokeWeight, this.props.noseAngle * 2)
               
             let shapesArr= [...this.state.shapes]
@@ -283,7 +282,7 @@ export default class Canvas extends React.Component {
         return this.mapRange(value, 100, 200, 0, 600)
     }
     getRectDimensions = (value) => {
-        return this.mapRange(value, 0, 24, 0, 60)
+        return this.mapRange(value, 0, 24, 0, 100)
     }
     //map range 1 to range 2
     mapRange = (value, low1, high1, low2, high2) => {
@@ -322,6 +321,7 @@ export default class Canvas extends React.Component {
             context.lineWidth = shape.lineWidth
             context.strokeStyle = shape.strokeStyle
             context.stroke()
+            
             let colors = `rgb${shape.color}`
             context.fillStyle = colors
             context.fill()
@@ -499,7 +499,8 @@ export default class Canvas extends React.Component {
 
     changeFillColor=(color)=>{
         let colorRGB=this.hexToRgb(color.hex)
-            this.setState({fill: `(${colorRGB.r},${colorRGB.g},${colorRGB.b})`})
+        
+            this.setState({fill: colorRGB})
           
     }
 

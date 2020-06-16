@@ -8,15 +8,15 @@ render(){
     if(this.props.isMine===true){
         return(<div id= "canvasDetails">
 
-    <p>Mode: {this.props.mode}</p>
+<button  id= "saveButton"onClick={this.props.save}>Save</button>
+
     <p>{this.props.project.name}</p>
-    <p> Made By:{this.props.project.user.user_name}</p>
-    <button onClick={this.props.save}>Save</button>
+
+    <p> Made By:&nbsp;{this.props.project.user.user_name}</p>
         </div>)
     }else{
 return(<div id= "canvasDetails">
 
-<p>Mode: {this.props.mode}</p>
 <p>{this.props.project.name}</p>
 <p> Made By:{this.props.project.user.user_name}</p>
 </div>)

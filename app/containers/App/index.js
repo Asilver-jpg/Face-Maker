@@ -38,8 +38,3 @@ export default class App extends React.Component {
     )}
 }
 
-{/* <Route exact path='/game' component={GameContainer}/>
-      <Route exact path='/' component={Home}/>
-      <Route exact path='/how_to_play' component={HowToPlay}/>
-      <Route exact path='/high_scores' component={ScoresContainer}/>
-      <Route exact path="/players" component={PlayersContainer} /> */}

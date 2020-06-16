@@ -1,19 +1,15 @@
 /* Home Styles */
 
 .container {
- 
-  flex-direction:column;
+ display: flex;
   min-height:100vh;
-  float:right;
   width:100%;
-  
-  background-color: aqua;
-
 }
 
 
 #overlay {
-  position: absolute;
+  margin-left:222%;
+  margin-top:15%;
   top: 0px;
   left: 0px;
   -o-transform : scaleX(-1);
@@ -29,12 +25,18 @@
   transform : scaleX(-1);
   -ms-filter : fliph; /*IE*/
   filter : fliph; /*IE*/
-  float:right;
-  margin-left:30000px;
-  
 }
 #container {
-  position : relative;
-  width : 100%;
-  /*margin : 0px auto;*/
+  display:flex;
+  flex-direction: row-reverse;
+  flex-wrap: nowrap;
+  width:100%;
+  justify-content: flex-end;
+
+}
+
+#video{
+  order:1;
+  margin-top: 15%;
+  width:300px; 
 }

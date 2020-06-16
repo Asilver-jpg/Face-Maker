@@ -8,10 +8,12 @@ export default class PortfolioContainer extends React.Component {
         user: ""
     }
     componentDidMount() {
+        console.log(this.state.user)
+
         fetch(`${URL}/users/${sessionStorage.getItem("user_id")}`)
             .then(response => response.json())
             .then(data => this.setState({ user: data }))
-            .then(data => console.log(this.state.user))
+      
  
     }
 
@@ -20,12 +22,13 @@ export default class PortfolioContainer extends React.Component {
         const projectRender= this.state.user.projects.map((project) => {
             return <ProjectCard key={project.id} project={project}></ProjectCard>
                  })
-        
+        const user= this.state.user
+        console.log(user)
         return (
             <div>
                 
                  <Navbar></Navbar>
-                 {this.state.user==="" ? <LoadingScreen/>: projectRender}
+                 {user=== "" ? <LoadingScreen/>: projectRender}
            
                 }
             </div>
