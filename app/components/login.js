@@ -1,6 +1,6 @@
 import React from 'react';
 import history from './history'
-
+import "./components.css"
 const URL = "http://localhost:3001"
 
 export default class Login extends React.Component {
@@ -41,17 +41,20 @@ export default class Login extends React.Component {
     }
     render(){
     return (
-        <div>
+        <div id="login">
+            <h1 id="loginTitle">FaceMaker</h1>
             <form onSubmit={event=> this.handleSubmit(event)}>
                 <label>
                     User Name:
                  <input type="text" name="username" onChange={event=>this.handleUserNameChange(event)} value={this.state.username}/>
                 </label>
+                <br></br>
                 <label>
                     Password:
                  <input type="text" name="password" onChange={event=>this.handlePasswordChange(event)} value={this.state.password}/>
                 </label>
-                <input type="submit" value="Submit" />
+                <input type="submit" value="Login" />
+                <input type="submit" value="Sign Up" />
             </form>
 
         </div>

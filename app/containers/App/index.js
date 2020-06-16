@@ -28,18 +28,13 @@ export default class App extends React.Component {
       <div>
         
       <Route exact path='/' component={sessionStorage.getItem("username") ? ProjectCardContainer : Login }/>
-      <Route exact path='/p' component={ColorPicker}/>
-      <Route exact path='/project/:id' component={ProjectContainer}/>
-      <Route exact path='/portfolio' component={PortfolioContainer}/>
-      <Route exact path='/new' component={NewContainer}/>
-      <Route exact path='/face' component={Face}/>
+      <Route exact path='/p' component={sessionStorage.getItem("username") ? ColorPicker : Login}/>
+      <Route exact path='/project/:id' component={sessionStorage.getItem("username") ? ProjectContainer : Login}/>
+      <Route exact path='/portfolio' component={sessionStorage.getItem("username") ? PortfolioContainer : Login}/>
+      <Route exact path='/new' component={sessionStorage.getItem("username") ? NewContainer : Login}/>
+      <Route exact path='/face' component={sessionStorage.getItem("username") ? Face :Login} />
       <Route exact path='/test' component={Test}/>
       </div>
     )}
 }
 
-{/* <Route exact path='/game' component={GameContainer}/>
-      <Route exact path='/' component={Home}/>
-      <Route exact path='/how_to_play' component={HowToPlay}/>
-      <Route exact path='/high_scores' component={ScoresContainer}/>
-      <Route exact path="/players" component={PlayersContainer} /> */}

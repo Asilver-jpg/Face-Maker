@@ -1,5 +1,6 @@
 import React from 'react';
 import history from '../components/history'
+import Navbar from '../components/navbar';
 
 const URL = "http://localhost:3001"
 
@@ -61,14 +62,18 @@ export default class NewContainer extends React.Component {
     render() {
         return (
             <div>
+           <Navbar></Navbar>
+            <div id="login">
+                <h1 id="loginTitle">FaceMaker</h1>
                 <form onSubmit={event => this.handleSubmit(event)}>
                     <label>
-                        Name:
+                        Project Name:
                  <input type="text" name="name" onChange={event => this.handleTitleChange(event)} value={this.state.title} />
                     </label>
                     <input type="submit" value="Submit" />
                 </form>
 
+            </div>
             </div>
         )
     }
