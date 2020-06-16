@@ -20,10 +20,13 @@ export default class PortfolioContainer extends React.Component {
 
 
     render() {
-        const projectRender= this.state.user.projects.map((project) => {
+        let projectRender=""
+        const user= this.state.user
+        if(user!==""){
+        projectRender= this.state.user.projects.map((project) => {
             return <ProjectCard name={this.state.user.user_name} key={project.id} project={project}></ProjectCard>
                  })
-        const user= this.state.user
+                }
 
         return (
             <div >

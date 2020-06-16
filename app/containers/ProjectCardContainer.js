@@ -1,6 +1,7 @@
 import React from 'react';
 import ProjectCard from "../components/projectCard.js"
 import Navbar from "../components/navbar"
+import LoadingScreen from  "../components/loadingScreen.js"
 import "./container.css"
 
 const URL = "http://localhost:3001"
@@ -19,15 +20,19 @@ export default class ProjectCardContainer extends React.Component {
 
 
     render() {
+        const projects= this.state.projects
+        let projectRender=""
+        if(projects!==""){
+            projectRender= this.state.projects.map((project) => {
+                return <ProjectCard key={project.id} project={project}></ProjectCard>
+                })
+        }
         return (
             
             <div >
                 <Navbar></Navbar>
                  <div class="projectCardContainer">
-                {this.state.projects.map((project) => {
-                    return <ProjectCard key={project.id} project={project}></ProjectCard>
-                    })
-                }
+               {projects==="" ? <LoadingScreen/> : projectRender}
                 </div>
             </div>
             )
