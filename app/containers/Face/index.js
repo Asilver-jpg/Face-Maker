@@ -340,7 +340,11 @@ export default class Home extends React.PureComponent {
   }
   render() {
     if(this.state.shouldRender===false){
-      return(<Canvas shouldRender={this.state.shouldRender} setShouldRender = {this.setShouldRender}mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
+      return(
+        <div>
+        <NavBar/>
+      <Canvas shouldRender={this.state.shouldRender} setShouldRender = {this.setShouldRender}mouthDist={this.state.mouthDist} nosePosition={this.state.nosePosition}faceToMove={this.state.faceToMove} noseAngle={this.state.noseAngle} eyebrowsHeld={this.state.eyebrowsHeld} eyebrows={this.state.eyebrows} noseScrunchHeld={this.state.noseScrunchHeld} noseScrunch={this.state.noseScrunch}></Canvas>
+      </div>
         )
     }else{
     return (

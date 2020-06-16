@@ -1,18 +1,17 @@
 import React from 'react';
 import "./components.css"
 import {Link} from 'react-router-dom'
+import Image from "../public/images/default.png"
 export default class ProjectCard extends React.Component{
 
 render(){
     return(
-        <div>
-          
-            <p>{this.props.project.name}</p>
-            
+        <div class="projectCard">        
              <Link to={{
                 pathname: `/project/${this.props.project.id}`,
                 
-                }}>{this.props.project.name}</Link> 
+                }}><img className= "projectImg"src= {Image} height="150"/><br/>
+                {this.props.project.name}</Link> 
         </div>
     )
 }

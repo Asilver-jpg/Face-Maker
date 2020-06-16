@@ -23,14 +23,15 @@ export default class PortfolioContainer extends React.Component {
             return <ProjectCard key={project.id} project={project}></ProjectCard>
                  })
         const user= this.state.user
-        console.log(user)
+
         return (
-            <div>
+            <div >
                 
                  <Navbar></Navbar>
+                 <div class="projectCardContainer">
                  {user=== "" ? <LoadingScreen/>: projectRender}
-           
-                }
+                 </div>
+                
             </div>
             )
         }

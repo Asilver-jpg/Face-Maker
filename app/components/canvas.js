@@ -505,7 +505,7 @@ export default class Canvas extends React.Component {
     }
 
     render() {
-
+        if(this.props.shouldRender){
         return (
             <div id="canvasDiv"  >
                 <canvas id="canvas" height="600" width="450"></canvas>
@@ -518,6 +518,18 @@ export default class Canvas extends React.Component {
             </div>
 
         )
+        }else{
+            return(
+                <div id="canvasDivNoUser"  >
+                <canvas id="canvas" height="600" width="450"></canvas>
+
+                <CanvasDetails mode= {this.state.mode}save={this.save} project={this.state.project} isMine={this.state.isMine}/>
+        
+
+            </div>
+
+            )
+        }
     }
 }
 
