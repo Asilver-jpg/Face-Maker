@@ -13,14 +13,15 @@ export default class PortfolioContainer extends React.Component {
         fetch(`${URL}/users/${sessionStorage.getItem("user_id")}`)
             .then(response => response.json())
             .then(data => this.setState({ user: data }))
-      
+            .then(res=> console.log(this.state.user.user_name))
+            
  
     }
 
 
     render() {
         const projectRender= this.state.user.projects.map((project) => {
-            return <ProjectCard key={project.id} project={project}></ProjectCard>
+            return <ProjectCard name={this.state.user.user_name} key={project.id} project={project}></ProjectCard>
                  })
         const user= this.state.user
 

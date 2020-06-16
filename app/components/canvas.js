@@ -159,7 +159,9 @@ export default class Canvas extends React.Component {
                     this.setState({ mode: "Select", noseIsScrunched: 0 })
                     break;
                 case "Select":
-                    this.setState({ mode: "Edit", noseIsScrunched: 0 })
+                    let shapesArr= this.state.shapes
+                    shapesArr.pop()
+                    this.setState({ mode: "Edit",activeShape:"", noseIsScrunched: 0, shapes: shapesArr })
                     break;
             }
         }
