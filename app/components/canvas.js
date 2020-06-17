@@ -447,19 +447,19 @@ export default class Canvas extends React.Component {
 
         // constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
         console.log(this.state.shapes)
-        this.state.shapes.forEach(shape => {
-            let updatedShape = {
-                value1: shape.posX,
-                value2: shape.posY,
-                value3: shape.width,
-                value4: shape.height,
-                fill: `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b} )`,
-                stroke: "no",
-                stroke_weight: 0,
-                render_number: 0,
-                rotation: shape.rotation,
-                project_id: this.getId()
-            }
+        // this.state.shapes.forEach(shape => {
+        //     let updatedShape = {
+        //         value1: shape.posX,
+        //         value2: shape.posY,
+        //         value3: shape.width,
+        //         value4: shape.height,
+        //         fill: `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b} )`,
+        //         stroke: "no",
+        //         stroke_weight: 0,
+        //         render_number: 0,
+        //         rotation: shape.rotation,
+        //         project_id: this.getId()
+        //     }
             //for patching, no reason to use yet. Will have to make a different object than above
             // if (shape.id) {
                 //   fetch(`${URL}/shapes/${shape.id}`,{
@@ -476,11 +476,11 @@ export default class Canvas extends React.Component {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(updatedShape),
+                    body: JSON.stringify(this.state.shapes),
                 }).then(resp => resp.json())
                     .then(json => console.log(json))
             
-        })
+        // })
         this.state.toRemove.forEach(shape => {
             this.removeShapeFromBackend(shape)
         })
