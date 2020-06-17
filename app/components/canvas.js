@@ -3,7 +3,7 @@ import "./components.css"
 import CanvasDetails from "./canvasDetails.js"
 import ColorPicker from "./colorPicker.js"
 import Controls from "./controls"
-
+import LoadingScreen from "./loadingScreen"
 const URL = "http://localhost:3001"
 const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
 //has props of faceToMove, eyebrows, eyebrowsHeld, noseScrunch, noseScrunchHeld and noseAngle
@@ -170,14 +170,14 @@ export default class Canvas extends React.Component {
     manageTransform = () => {
         let color = `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b})`
         if (this.state.activeShape === "") {
-            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, color, this.state.stroke, this.state.strokeWeight, 0)
+            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, color, this.state.stroke, this.state.strokeWeight, 0, this.getId)
             this.addToShapes(newShape)
             this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
         } else {
             this.setActiveShapeFill(this.state.activeShapePreviousColor)
             let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
                 this.state.startHeight + this.getRectDimensions(this.props.mouthDist), color, this.state.stroke,
-                this.state.strokeWeight, this.props.noseAngle * 2)
+                this.state.strokeWeight, this.props.noseAngle * 2, this.getId)
               
             let shapesArr= [...this.state.shapes]
             shapesArr.pop()
@@ -256,7 +256,7 @@ export default class Canvas extends React.Component {
                     this.setState({shapes:shapesArr, eyebrowsUp:true})
                 }else{
                     //make rectangle
-                    let rectangle= new Rectangle(activeShape.posX, activeShape.posY, activeShape.radius*2, activeShape.radius*2,this.state.fill, this.state.stroke ,0 )
+                    let rectangle= new Rectangle(activeShape.posX, activeShape.posY, activeShape.radius*2, activeShape.radius*2,this.state.fill, this.state.stroke ,0, this.getId )
                     shapesArr[shapesArr.length-1] =rectangle
                     this.setState({shapes:shapesArr}, eyebrowsUp:true)
 
@@ -370,9 +370,9 @@ export default class Canvas extends React.Component {
 
         this.state.project.shapes.forEach(shape => {
             if (shape.value4 !== null) {
-                let rect = new Rectangle(shape.value1, shape.value2, shape.value3, shape.value4, shape.fill, shape.stroke, shape.stroke_weight, shape.rotation)
+                let rect = new Rectangle(shape.value1, shape.value2, shape.value3, shape.value4, shape.fill, shape.stroke, shape.stroke_weight, shape.rotation, this.getId)
                 rect.setId(shape.id)
-
+                
                 this.addToShapes(rect)
             }
 
@@ -446,7 +446,7 @@ export default class Canvas extends React.Component {
     save = () => {
 
         // constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
-
+        console.log(this.state.shapes)
         this.state.shapes.forEach(shape => {
             let updatedShape = {
                 value1: shape.posX,
@@ -461,7 +461,7 @@ export default class Canvas extends React.Component {
                 project_id: this.getId()
             }
             //for patching, no reason to use yet. Will have to make a different object than above
-            if (shape.id) {
+            // if (shape.id) {
                 //   fetch(`${URL}/shapes/${shape.id}`,{
                 //            method: 'PATCH',
                 //            headers: {
@@ -470,7 +470,7 @@ export default class Canvas extends React.Component {
                 //            body: JSON.stringify(updatedShape),    
                 //        }).then(resp=>resp.json())
                 //        .then(json=> console.log(json)) 
-            } else {
+            // } else {
                 fetch(`${URL}/shapes`, {
                     method: 'POST',
                     headers: {
@@ -479,7 +479,7 @@ export default class Canvas extends React.Component {
                     body: JSON.stringify(updatedShape),
                 }).then(resp => resp.json())
                     .then(json => console.log(json))
-            }
+            
         })
         this.state.toRemove.forEach(shape => {
             this.removeShapeFromBackend(shape)
@@ -507,7 +507,8 @@ export default class Canvas extends React.Component {
     }
 
     render() {
-        if(this.props.shouldRender){
+      
+    if(this.props.shouldRender){
         return (
             <div id="canvasDiv"  >
                 <canvas id="canvas" height="600" width="450"></canvas>
@@ -536,7 +537,7 @@ export default class Canvas extends React.Component {
 }
 
 class Rectangle {
-    constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
+    constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0, projectId=null) {
         this.posX = posX
         this.posY = posY
         this.width = width
@@ -547,6 +548,7 @@ class Rectangle {
         this.colorKey = new Color(0, 0, 0)
         this.rotation = rotation
         this.id = null
+        this.projectId=projectId
     }
     setColorKey(value) {
         this.colorKey = value
