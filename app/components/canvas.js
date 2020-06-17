@@ -453,7 +453,7 @@ export default class Canvas extends React.Component {
                 value2: shape.posY,
                 value3: shape.width,
                 value4: shape.height,
-                fill: `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b} )`,
+                fill: shape.color,
                 stroke: "no",
                 stroke_weight: 0,
                 render_number: 0,
