@@ -170,14 +170,14 @@ export default class Canvas extends React.Component {
     manageTransform = () => {
         let color = `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b})`
         if (this.state.activeShape === "") {
-            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, color, this.state.stroke, this.state.strokeWeight, 0, this.getId)
+            let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, color, this.state.stroke, this.state.strokeWeight, 0, this.getId())
             this.addToShapes(newShape)
             this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
         } else {
             this.setActiveShapeFill(this.state.activeShapePreviousColor)
             let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
                 this.state.startHeight + this.getRectDimensions(this.props.mouthDist), color, this.state.stroke,
-                this.state.strokeWeight, this.props.noseAngle * 2, this.getId)
+                this.state.strokeWeight, this.props.noseAngle * 2, this.getId())
               
             let shapesArr= [...this.state.shapes]
             shapesArr.pop()
@@ -256,7 +256,7 @@ export default class Canvas extends React.Component {
                     this.setState({shapes:shapesArr, eyebrowsUp:true})
                 }else{
                     //make rectangle
-                    let rectangle= new Rectangle(activeShape.posX, activeShape.posY, activeShape.radius*2, activeShape.radius*2,this.state.fill, this.state.stroke ,0, this.getId )
+                    let rectangle= new Rectangle(activeShape.posX, activeShape.posY, activeShape.radius*2, activeShape.radius*2,this.state.fill, this.state.stroke ,0, this.getId() )
                     shapesArr[shapesArr.length-1] =rectangle
                     this.setState({shapes:shapesArr}, eyebrowsUp:true)
 
@@ -370,7 +370,7 @@ export default class Canvas extends React.Component {
 
         this.state.project.shapes.forEach(shape => {
             if (shape.value4 !== null) {
-                let rect = new Rectangle(shape.value1, shape.value2, shape.value3, shape.value4, shape.fill, shape.stroke, shape.stroke_weight, shape.rotation, this.getId)
+                let rect = new Rectangle(shape.value1, shape.value2, shape.value3, shape.value4, shape.fill, shape.stroke, shape.stroke_weight, shape.rotation, this.getId())
                 rect.setId(shape.id)
                 
                 this.addToShapes(rect)
