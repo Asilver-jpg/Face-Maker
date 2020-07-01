@@ -2,6 +2,11 @@
 # FaceMaker
 
 This is an React application where users can create art using their faces.
+
+The Rails backend for this application can be found at [here](https://github.com/Asilver-jpg/faceArt_backend), and MUST be run on port 3001 in order to function properly. 
+
+A video demo of this app can be found here: https://vimeo.com/434496247.
+
 #### Front-End
 1. ClmTrackr
 2. React
@@ -11,8 +16,6 @@ This is an React application where users can create art using their faces.
 
 #### Back-End
 1.Ruby on Rails
-
-The Rails backend for this application can be found at [here](https://github.com/Asilver-jpg/faceArt_backend), and MUST be run on port 3001 in order to function properly. 
 
 If you don't want to make an account, simply type in Boblin as a username and click log in.
 
