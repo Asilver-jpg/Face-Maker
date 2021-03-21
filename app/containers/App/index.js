@@ -28,11 +28,9 @@ export default class App extends React.Component {
       <div>
         
       <Route exact path='/' component={sessionStorage.getItem("username") ? ProjectCardContainer : Login }/>
-      <Route exact path='/p' component={sessionStorage.getItem("username") ? ColorPicker : Login}/>
       <Route exact path='/project/:id' component={sessionStorage.getItem("username") ? ProjectContainer : Login}/>
       <Route exact path='/portfolio' component={sessionStorage.getItem("username") ? PortfolioContainer : Login}/>
       <Route exact path='/new' component={sessionStorage.getItem("username") ? NewContainer : Login}/>
-      <Route exact path='/face' component={sessionStorage.getItem("username") ? Face :Login} />
       <Route exact path='/test' component={Test}/>
       </div>
     )}

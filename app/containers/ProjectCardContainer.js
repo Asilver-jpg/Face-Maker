@@ -14,7 +14,7 @@ export default class ProjectCardContainer extends React.Component {
         fetch(`${URL}/projects`)
             .then(response => response.json())
             .then(data => this.setState({ projects: data }))
-            .then(data => console.log(this.state.projects))
+           
  
     }
 

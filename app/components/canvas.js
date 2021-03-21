@@ -42,20 +42,24 @@ export default class Canvas extends React.Component {
     }
 
     componentDidMount() {
-        //rect posX, posY, width, height, fill, stroke, strokeWeight
+        //define variables from state
         let id = this.getId()
-
         let mainCanvas = document.querySelector("#canvas")
         let mainContext = mainCanvas.getContext("2d")
         let hitCanvas = document.createElement('canvas')
+        hitCanvas.id= "2"
+        let hitCtx = hitCanvas.getContext('2d')
+
+        //define the canvas width and height
         hitCanvas.width = 450
         hitCanvas.height = 600
-        let hitCtx = hitCanvas.getContext('2d')
 
         let canvasWidth = mainCanvas.width
         let canvasHeight = mainCanvas.height
 
-
+        //get last number in the URL & check if entry is in table
+        //if it is in table then check if the user_id attached to the canvas is the same as the one stored in session storage on login
+        //then, render the canvas with the ability to edit or not. 
         let isNum = /^\d+$/
         if (isNum.test(id)) {
             fetch(`${URL}/projects/${id}`)
@@ -87,7 +91,9 @@ export default class Canvas extends React.Component {
         }
         this.state.loop
     }
+
     componentDidUpdate(prevProps, prevState) {
+        //if the canvas has changed in any way i.e. add, subtract shapes, draw the shapes again
         if (prevState.mainContext !== this.state.mainContext) {
             setInterval(() => { this.drawAllShapes() }, 1000)
         }
@@ -100,11 +106,12 @@ export default class Canvas extends React.Component {
 
     //called every 3 milliseconds
     draw = () => {
-        //console.log(this.props.nosePosition[0])
+        //erase everything on the canvas as to not have duplicate shapes
         this.clearCanvas(this.state.mainContext)
 
-        //if face is in the right place and exists
+        //if face is in the right place and exists, we allow editing
         if (this.props.faceToMove === 0) {
+            //get and update the nose's position. Then check which edit mode we are in
             this.setState({
                 mappedNosePosition: {
                     x: this.getCanvasPointX(Math.floor(this.props.nosePosition[0])),
@@ -122,19 +129,23 @@ export default class Canvas extends React.Component {
                 this.managePlacement()
             })
         }
+        //reset the delete function
         if (this.props.eyebrows === false) {
             this.setState({ toDelete: false })
         }
+        //draw all the shapes
         this.drawAllShapes()
+        //if we are in select mode, be sure to draw a cursor
         if (this.state.mode === "Select") {
             this.drawCursor(this.state.mainContext)
         }
     }
 
+    //function to clear the canvas
     clearCanvas = (context) => {
         context.clearRect(0, 0, 450, 600)
     }
-    //shape management functions
+    //shape management functions; mostly checkes to see if the nose is scrunched or not
     manageMode = () => {
         if (this.state.noseIsScrunched === 0 && this.props.noseScrunch) {
             this.setState({ noseIsScrunched: 1 })
@@ -156,29 +167,34 @@ export default class Canvas extends React.Component {
         } else if (this.state.noseIsScrunched === 2 && this.props.noseScrunch === false) {
             switch (this.state.mode) {
                 case "Edit":
-                    this.setState({ mode: "Select", noseIsScrunched: 0 })
+                    let shapesArr= [...this.state.shapes]
+                    shapesArr.pop()
+                    this.setState({ mode: "Select", noseIsScrunched: 0, shapes: shapesArr})
                     break;
                 case "Select":
-                    let shapesArr= this.state.shapes
-                    shapesArr.pop()
-                    this.setState({ mode: "Edit",activeShape:"", noseIsScrunched: 0, shapes: shapesArr })
+                    this.setState({ mode: "Edit", activeShape:"", noseIsScrunched: 0 })
                     break;
             }
         }
     }
+    //manage functions influence the canvas and are called in manageMode
     //posX, posY, width, height, fill, stroke, strokeWeight
     manageTransform = () => {
+        //get the color in the selector
         let color = `(${this.state.fill.r},${this.state.fill.g},${this.state.fill.b})`
+        //if we do not have an active shape i.e. we just started the program, deleted a shape or just placed a shape
+        //create a new shape (default is a rectangle) add it to the end of the render list and set it to the active shape
+       
         if (this.state.activeShape === "") {
             let newShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 60, 60, color, this.state.stroke, this.state.strokeWeight, 0, this.getId())
             this.addToShapes(newShape)
             this.setState({ activeShape: newShape, startHeight: newShape.height, startWidth: newShape.width })
         } else {
+        //otherwise, set the active shape's fill to the 
             this.setActiveShapeFill(this.state.activeShapePreviousColor)
             let editedNewShape = new Rectangle(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, this.state.startWidth + this.getRectDimensions(this.props.mouthDist),
                 this.state.startHeight + this.getRectDimensions(this.props.mouthDist), color, this.state.stroke,
                 this.state.strokeWeight, this.props.noseAngle * 2, this.getId())
-              
             let shapesArr= [...this.state.shapes]
             shapesArr.pop()
             shapesArr.push(editedNewShape)
@@ -193,7 +209,7 @@ export default class Canvas extends React.Component {
         if (this.props.eyebrows && this.state.activeShape !== "") {
             if (this.state.mode === "Edit" && this.state.isPlaced === false) {
                 this.setState({ activeShape: "", isPlaced: true })
-                this.addHitGraph()
+                this.addHitGraph();
             }
         } else if (this.props.eyebrows === false && this.state.isPlaced === true) {
             this.setState({ isPlaced: false })
@@ -201,18 +217,21 @@ export default class Canvas extends React.Component {
     }
 
     manageSelect = () => {
-        const pixel = this.state.hitCtx.getImageData(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 1, 1).data
-        const color = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
+        let pixel = this.state.hitCtx.getImageData(this.state.mappedNosePosition.x, this.state.mappedNosePosition.y, 1, 1).data
+        let color = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
+      
         const shape = this.state.colorsHash[color];
-        console.log(this.state.activeShape !== "")
+        
         if (!this.props.eyebrows) {
             this.setState({ eyebrowsUp: false })
         }
+        //delete active shape
         if (this.state.activeShape !== "" && this.props.eyebrowsHeld) {
             console.log("Deleting")
             this.deleteShape(this.state.activeShape)
             this.setState({ fromSelect: false, eyebrowsUp: true, activeShape: "" })
-        } else
+        } else {
+        //assign active shape
             if (shape !== undefined && this.props.eyebrows && this.state.eyebrowsUp === false) {
                 console.log("Select")
                 this.setState({ activeShape: shape, eyebrowsUp: true, fromSelect: true }, ()=>{ this.setActiveShapeFill("(0,0,0)")})
@@ -223,6 +242,7 @@ export default class Canvas extends React.Component {
                 this.setState({ activeShape: "", eyebrowsUp: true, fromSelect: false })
             }
     }
+}
 
 
 
@@ -258,7 +278,7 @@ export default class Canvas extends React.Component {
                     //make rectangle
                     let rectangle= new Rectangle(activeShape.posX, activeShape.posY, activeShape.radius*2, activeShape.radius*2,this.state.fill, this.state.stroke ,0, this.getId() )
                     shapesArr[shapesArr.length-1] =rectangle
-                    this.setState({shapes:shapesArr}, eyebrowsUp:true)
+                    this.setState({shapes:shapesArr, eyebrowsUp:true})
 
                 }
             })
@@ -301,6 +321,8 @@ export default class Canvas extends React.Component {
 
 
     //drawing functions
+
+    //draws a circle (unused atm)
     drawCircle = (posx, posy, radius, context) => {
 
         let r = 40;
@@ -318,17 +340,19 @@ export default class Canvas extends React.Component {
         }
     }
 
-    drawRectangle = (shape, context, color) => {
-        if (context.canvas.id) {
+    //actually draws rectangles
+    drawRectangle = (shape, context) => {
+        if (context.canvas.id === "canvas") {
             context.lineWidth = shape.lineWidth
             context.strokeStyle = shape.strokeStyle
             context.stroke()
             
-            let colors = `rgb${shape.color}`
-            context.fillStyle = colors
+            let color = `rgb${shape.color}`
+            context.fillStyle = color
             context.fill()
         } else {
             context.fillStyle = shape.colorKey
+            context.fill()
         }
         context.beginPath()
         context.translate(shape.posX + (shape.width / 2), shape.posY + (shape.height / 2))
@@ -351,11 +375,13 @@ export default class Canvas extends React.Component {
 
 
     }
+
+    //this creates an invisible canvas for hit detection where each shape has a different fill. Called every time a shape is placed
     addHitGraph = () => {
         this.state.shapes.forEach(shape => {
             while (true) {
+                this.setState({colorsHash : {} })
                 const colorKey = this.getRandomColor()
-
                 if (!this.state.colorsHash[colorKey]) {
                     shape.colorKey = colorKey
                     this.state.colorsHash[colorKey] = shape
@@ -365,7 +391,7 @@ export default class Canvas extends React.Component {
             }
         })
     }
-    //  constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
+    //  constructor for rectangle(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
     addAllShapesFromProject = () => {
 
         this.state.project.shapes.forEach(shape => {
@@ -385,22 +411,25 @@ export default class Canvas extends React.Component {
         if (this.state.mode === "Edit") {
             const filter= this.state.shapes.filter((shape)=>shape.color===this.state.fill)
             this.state.shapes.forEach(shape => {
-                this.drawTheShapes(shape, this.state.mainContext, shape.color)
+                this.drawTheShape(shape, this.state.mainContext, shape.color)
+                this.drawTheShape(shape, this.state.hitCtx, shape.colorKey)
+
             })
-            for (let i = 0; i < this.state.shapes.length - 1; i++) {
-                this.drawTheShapes(this.state.shapes[i], this.state.hitCtx, this.state.shapes[i].colorKey)
-            }
+           
         } else if (this.state.mode === undefined) {
-            this.drawTheShapes(shape, this.state.mainContext, shape.color)
+            this.drawTheShape(shape, this.state.mainContext, shape.color)
+            this.drawTheShape(shape, this.state.hitCtx, shape.colorKey)
+
 
         } else if (this.state.mode === "d") {
             this.state.shapes.forEach(shape => {
-                this.drawTheShapes(shape, this.state.mainContext, shape.color)
+                this.drawTheShape(shape, this.state.mainContext, shape.color)
+                this.drawTheShape(shape, this.state.hitCtx, shape.colorKey)
             })
         } else {
             this.state.shapes.forEach(shape => {
-                this.drawTheShapes(shape, this.state.mainContext, shape.color)
-                this.drawTheShapes(shape, this.state.hitCtx, shape.colorKey)
+                this.drawTheShape(shape, this.state.mainContext, shape.color)
+                this.drawTheShape(shape, this.state.hitCtx, shape.colorKey)
             })
         }
     }
@@ -415,14 +444,14 @@ export default class Canvas extends React.Component {
             }
         })
     }
-    drawTheShapes = (shape, context, color) => {
+    drawTheShape = (shape, context, color) => {
         if (shape.radius) {
 
             this.drawCircle(shape, context)
 
         } else if (shape.width) {
 
-            this.drawRectangle(shape, context, color)
+            this.drawRectangle(shape, context)
         }
     }
     addToShapes = (shape) => {
@@ -436,6 +465,7 @@ export default class Canvas extends React.Component {
         return `rgb(${r},${g},${b})`;
     }
     hexToRgb = (hex) => {
+        
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
             r: parseInt(result[1], 16),
@@ -445,8 +475,7 @@ export default class Canvas extends React.Component {
     }
     save = () => {
 
-        // constructor(posX, posY, width, height, fill, stroke, strokeWeight, rotation = 0) {
-        console.log(this.state.shapes)
+        //get information for each shape necessary to create them in backend then post the array to be deconstructed later        
         this.state.shapes.forEach(shape => {
             let updatedShape = {
                 value1: shape.posX,
@@ -487,6 +516,7 @@ export default class Canvas extends React.Component {
 
     }
 
+    //a delete function to remove from the backend table
     removeShapeFromBackend = (shape) => {
         fetch(`${URL}/shapes/${shape.id}`, {
             method: 'DELETE'
@@ -499,6 +529,7 @@ export default class Canvas extends React.Component {
         return id
     }
 
+    //change the fill color
     changeFillColor=(color)=>{
         let colorRGB=this.hexToRgb(color.hex)
         
@@ -506,6 +537,7 @@ export default class Canvas extends React.Component {
           
     }
 
+    //Function used to render the face cam, its controls, and the color picker when necessary
     render() {
       
     if(this.props.shouldRender){
@@ -515,6 +547,7 @@ export default class Canvas extends React.Component {
         return (
             <div id="canvasDiv"  >
                 <canvas id="canvas" height="600" width="450"></canvas>
+                <canvas id="2" height="600" width="450"></canvas>
 
                 <CanvasDetails mode= {this.state.mode}save={this.save} project={this.state.project} isMine={this.state.isMine}/>
                 <ColorPicker changeFillColor= {this.changeFillColor}/>

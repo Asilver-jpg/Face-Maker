@@ -17,6 +17,8 @@ export default class Home extends React.PureComponent {
 
   constructor() {
     super();
+
+    
     this.state = {
       //capture
       vid: "",
@@ -66,7 +68,6 @@ export default class Home extends React.PureComponent {
   }
 
   componentDidMount() {
-    console.log(this.state.shouldRender)
     if(this.state.shouldRender===true){
     let vid = document.getElementById('videoel');
     let overlay = document.getElementById('overlay');
@@ -299,6 +300,8 @@ export default class Home extends React.PureComponent {
       this.setState({ eyebrowsHeld: true })
     }
   }
+
+  //checks if face is moving forward or backward from the camera
   faceMovementDirection = (length) => {
     if (this.state.nosePrev - length < -2) {
       this.setState({ faceDirection: "forward" })
@@ -312,9 +315,13 @@ export default class Home extends React.PureComponent {
   updatePrev = () => {
     this.setState({ nosePrev: this.state.noseDist })
   }
+
+  //nice map function
   mapRange = (value, low1, high1, low2, high2) => {
     return low2 + (high2 - low2) * (value - low1) / (high1 - low1)
   }
+
+  //returns the angle of a line created between two points
   returnAngle = (cp) => {
     let p1 = cp[33]
     let p2 = cp[62]
@@ -322,10 +329,13 @@ export default class Home extends React.PureComponent {
     let radians = Math.atan(slope)
     return this.radiansToDegrees(radians)
   }
+
+  //returns distance from point a to point b
   returnDistance = (p1, p2) => {
     return Math.sqrt(Math.pow(p2[0] - p1[0], 2) + Math.pow(p2[1] - p1[1], 2))
   }
 
+  //converts radians to degrees
   radiansToDegrees = (radians) => {
     let pi = 3.14159265359
     return radians * 180 / pi
@@ -334,10 +344,13 @@ export default class Home extends React.PureComponent {
   setShouldRender=(val)=>{
     this.setState({shouldRender: val})
   }
+
+  //the "e" is kept in for testing purposes
   eyebrowsButton= (e) =>{
     console.log(e)
     this.setState({eyebrows :true})
   }
+
   render() {
     if(this.state.shouldRender===false){
       return(
@@ -347,6 +360,7 @@ export default class Home extends React.PureComponent {
       </div>
         )
     }else{
+      //the commented out section below is for development purposes
     return (
       <div className="container" onKeyDown= {this.eyebrowsButton}>
         <NavBar/>
