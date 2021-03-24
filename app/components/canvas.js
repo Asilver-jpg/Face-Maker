@@ -42,13 +42,13 @@ export default class Canvas extends React.Component {
     }
 
     componentDidMount() {
-        //define variables from state
+        //define variables that are in state
         let id = this.getId()
         let mainCanvas = document.querySelector("#canvas")
         let mainContext = mainCanvas.getContext("2d")
         let hitCanvas = document.createElement('canvas')
         hitCanvas.id= "2"
-        let hitCtx = hitCanvas.getContext('2d')
+        let hitCtx = hitCanvas.getContext("2d")
 
         //define the canvas width and height
         hitCanvas.width = 450
@@ -108,7 +108,7 @@ export default class Canvas extends React.Component {
     draw = () => {
         //erase everything on the canvas as to not have duplicate shapes
         this.clearCanvas(this.state.mainContext)
-
+        
         //if face is in the right place and exists, we allow editing
         if (this.props.faceToMove === 0) {
             //get and update the nose's position. Then check which edit mode we are in
@@ -168,8 +168,11 @@ export default class Canvas extends React.Component {
             switch (this.state.mode) {
                 case "Edit":
                     let shapesArr= [...this.state.shapes]
+                    console.log(shapesArr.length)
                     shapesArr.pop()
-                    this.setState({ mode: "Select", noseIsScrunched: 0, shapes: shapesArr})
+                    console.log("After " + shapesArr.length)
+                    this.setState({ mode: "Select", noseIsScrunched: 0, shapes: shapesArr}, () => { console.log(this.state.shapes.length)})
+                    
                     break;
                 case "Select":
                     this.setState({ mode: "Edit", activeShape:"", noseIsScrunched: 0 })

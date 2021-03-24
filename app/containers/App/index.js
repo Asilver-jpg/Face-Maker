@@ -14,8 +14,7 @@ import ProjectContainer from "../projectContainer"
 import PortfolioContainer from "../portfolioContainer"
 import NewContainer from "../newContainer"
 import Login from "../../components/login"
-import ColorPicker from "../../components/colorPicker"
-import NotFound from 'containers/NotFound';
+
 
 
 import './style.css';
